@@ -7,12 +7,16 @@ import pyodbc
 import pandas as pd
 import datetime as dt
 import yaml
+import os
+from pathlib import Path
 
 # En el servidor SQL hay que habilitar el puerto TCP del servidor y abrirlo en el firewall
 # https://docs.microsoft.com/es-es/sql/relational-databases/lesson-2-connecting-from-another-computer?view=sql-server-ver15
 
+module_path = os.path.dirname(__file__)
+
 try: 
-    with open('./config_BBDD.yaml','r') as config_file:
+    with open(str(Path(module_path, 'config_BBDD.yaml')),'r') as config_file:
         config = yaml.load(config_file, Loader = yaml.FullLoader) #Se utiliza el FullLoader para evitar un mensaje de advertencia, ver https://msg.pyyaml.org/load para mas información
         servidor = config['Servidor']                             #No se utiliza el BasicLoader debido a que interpreta todo como strings, con FullLoader los valores numéricos los intrepreta como int o float
         bbdd = config['BBDD']
