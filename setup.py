@@ -19,5 +19,7 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     packages=['lecturaBBDD'],
-    zip_safe=False
+    zip_safe=False,
+    package_data={'': ['*.txt','*.yml']},
+    include_package_data=True,
 )
