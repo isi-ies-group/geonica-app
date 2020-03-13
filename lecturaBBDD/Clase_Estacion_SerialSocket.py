@@ -56,7 +56,7 @@ class Estacion:
         except: 
             return False
         
-    def set_serial_port(self, Port):
+    def set_serial_port(self, Port=None):
         try:
             self.ser.port = Port
             return True 
