@@ -12,7 +12,7 @@ setuptools.setup(
     url='http://github.com/isi-ies-group/pygeonica',
     author="Martin",
     author_email="m.nenkov@alumnos.upm.es",
-    description="Pequeña librería que facilita la lectura de la base de datos geonica",
+    description="Pequeña librería que facilita la lectura de canales de una unidad Meteodata y de la base de datos de Geonica Suite 4K",
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: Windows",
