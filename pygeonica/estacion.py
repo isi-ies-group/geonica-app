@@ -315,7 +315,7 @@ def _serial(dir_serial, trama):
 ###########################################################################################################
 
 
-def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
+def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
     '''
 
     Parameters
@@ -345,8 +345,8 @@ def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
 
     Returns
     -------
-    info : list
-        DESCRIPTION.
+    fecha : datetime
+	medidas : list (float)
 
     '''
     
@@ -442,10 +442,10 @@ def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
         return -1
     
     #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas
-    return [fecha, medidas]
+    return fecha, medidas
 
 
-def sincronizar_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
+def sincroniza_hora(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
     '''
 
     Parameters
