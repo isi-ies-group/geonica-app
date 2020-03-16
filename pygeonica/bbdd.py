@@ -16,7 +16,7 @@ from pathlib import Path
 module_path = os.path.dirname(__file__)
 
 try: 
-    with open(str(Path(module_path, 'config/config_BBDD.yaml')),'r') as config_file:
+    with open(str(Path(module_path, 'bbdd_config.yaml')),'r') as config_file:
         config = yaml.load(config_file, Loader = yaml.FullLoader) #Se utiliza el FullLoader para evitar un mensaje de advertencia, ver https://msg.pyyaml.org/load para mas información
         servidor = config['Servidor']                             #No se utiliza el BasicLoader debido a que interpreta todo como strings, con FullLoader los valores numéricos los intrepreta como int o float
         bbdd = config['BBDD']
