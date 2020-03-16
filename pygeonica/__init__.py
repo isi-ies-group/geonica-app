@@ -5,4 +5,3 @@ Created on Fri Mar  6 11:28:58 2020
 @author: Martin
 """
 
-from .pygeonica import *
