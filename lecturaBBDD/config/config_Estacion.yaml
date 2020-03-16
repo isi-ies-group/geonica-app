@@ -1,0 +1,15 @@
+##################################################################
+##      
+##      Configuración del módulo lectura de estación
+##
+##################################################################
+
+BYTEORDER : big
+PASS : "geonica "
+NUMERO_ESTACION : 316
+NUMERO_USUARIO : 1
+PORT : 30000
+TIEMPO_RTS_ACTIVO : 0.1
+TIEMPO_ESPERA_DATOS : 0.5
+Estaciones: 316,2168,2171
+
