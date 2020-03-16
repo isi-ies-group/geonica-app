@@ -42,7 +42,7 @@ password = bbdd['Contrasena']            #Contraseña por defecto
 # Instalar driver (si no está ya al instalar GEONICA SUITE 4K)
 # https://www.microsoft.com/en-us/download/details.aspx?id=36434
 
-def request_ddbb(server_address = server):                                            #request común a todas las funciones
+def _request_ddbb(server_address = server):                                            #request común a todas las funciones
     request = (                                                         
             'DRIVER={ODBC Driver 11 for SQL Server};'                   ##Se seleccion el driver a utilizar
             # la ; hace que falle si hay más campos
@@ -60,7 +60,7 @@ def get_data_raw(numero_estacion, fecha_desde, fecha_hasta = dt.date.today()):
         estos datos incluyen todos las funciones que estén configuradas en la estación.
 
     '''
-    request = request_ddbb()
+    request = _request_ddbb()
     
     query_data = (
             'SELECT Fecha, Valor, NumParametro FROM Datos '
@@ -83,7 +83,7 @@ def get_parameters():
         junto con su número de parametro y unidad.
 
     '''
-    request = request_ddbb()
+    request = _request_ddbb()
     
     query_parameters = (
             'SELECT NumParametro, Nombre, Abreviatura, Unidad FROM Parametros_spanish '
@@ -103,7 +103,7 @@ def get_channels_config(numero_estacion):
     estos canales estan ordenados en el mismo orden en el que los deveulve la estación
     cuando se le solicita (mediante puerto Serie, conexión IP, etc. ) los datos de los canales.
     '''
-    request = request_ddbb()
+    request = _request_ddbb()
     
     query_channels_config = (
             'SELECT Canales.NumFuncion, Canales.Canal, Parametros_spanish.Abreviatura, Parametros_spanish.NumParametro '
@@ -127,7 +127,7 @@ def get_functions():
     Devuelve una lista con el número correspondiente a la función.
     '''
     
-    request = request_ddbb()
+    request = _request_ddbb()
     
     query_functions = (
             'SELECT NumFuncion, Nombre FROM dbo.Funciones_MI '

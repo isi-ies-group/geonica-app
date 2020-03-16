@@ -51,7 +51,7 @@ TIEMPO_ESPERA_DATOS = config['TIEMPO_ESPERA_DATOS']
 ###########################################################################################################
 
 
-def __cabecera(numero_estacion):  #La cabecera de todos los mensajes recibidos por el sistema de medición
+def _cabecera(numero_estacion):  #La cabecera de todos los mensajes recibidos por el sistema de medición
     DLE = bytes(chr(16), encoding='ascii')                  #Data Link Escape
     SYN = bytes(chr(22), encoding='ascii')                  #Syncronos Idle
     SOH = bytes(chr(1), encoding='ascii')                   #Start of Heading
@@ -63,7 +63,7 @@ def __cabecera(numero_estacion):  #La cabecera de todos los mensajes recibidos p
     return CABECERA
 
 
-def __comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano( o un entero) indicando si se ha producido algun error:
+def _comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano( o un entero) indicando si se ha producido algun error:
                                                                               # True: Recepcion correcta
                                                                               # False: Recepcion de bytes incorrecta
                                                                               # Entero: Indica el codigo del error producido (Mirar página 9 del Protocolo de comunicaciones de Geonica Meteodata 3000)
@@ -72,13 +72,13 @@ def __comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano
     estado = bool()
     
     if bytes_recibidos == 13:                                           #Respuesta indicando sincronizacion completada o error en la comunicación
-        if trama[:8] == __cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
+        if trama[:8] == _cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
             if (trama[11] == 4):                                                #Bits indicando el fin de la transmisión, sincronización completada
                 estado = True                                                         #Se devuelve un booleano indicando sincronización completada
             elif (trama[11] == 21):                                             #Error en la sincronización
                 return int.from_bytes(trama[10])                                    #Se devuelve el indicador del estado del error            
     elif bytes_recibidos == 193:            #Respuesta indicando las mediciones pedidas
-        if trama[:8] == __cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
+        if trama[:8] == _cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
                 estado = True
     else:
         estado = False                                                    #Estado de error
@@ -86,7 +86,7 @@ def __comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano
     return estado
 
 
-def __visulizar_trama(trama_bytes):
+def _visulizar_trama(trama_bytes):
     '''
     Este método decodifica la trama recibida de la estación, el caso expuesto a continución se produce cuando se
     solicitan los valores intanstáneos de la estación. En el caso de que se soliciten otro tipo de valores, 
@@ -112,7 +112,7 @@ def __visulizar_trama(trama_bytes):
     trama.append(trama_bytes[17])                                                       #Segundo de la estación
     trama.append(trama_bytes[18])                                                       #Data Link Escape
     trama.append(trama_bytes[19])                                                       #Start of Text
-    trama = trama + __decodificar_medidas(trama_bytes)                                  #Datos recibidos de los canales, y codificados en formato flotante IEEE 754 32bit(4 bytes por dato)
+    trama = trama + _decodificar_medidas(trama_bytes)                                  #Datos recibidos de los canales, y codificados en formato flotante IEEE 754 32bit(4 bytes por dato)
     
     lista1 = []                                                                         
     for i in range(48 - 1):                                                             #Número de muestra correspondiente desde el incio del perido
@@ -133,7 +133,7 @@ def __visulizar_trama(trama_bytes):
     return trama
 
 
-def __genera_trama(numero_estacion, comando, hora = dt.datetime.now()):
+def _genera_trama(numero_estacion, comando, hora = dt.datetime.now()):
     if type(comando) == int: #Se pide una medida
         DLE = bytes(chr(16), encoding='ascii')
         SYN = bytes(chr(22), encoding='ascii')
@@ -171,7 +171,7 @@ def __genera_trama(numero_estacion, comando, hora = dt.datetime.now()):
     return trama
 
 
-def __decodificar_medidas(trama_bytes):
+def _decodificar_medidas(trama_bytes):
     trama = bytearray(trama_bytes)
     medidas = []
     canales_configurados = trama_bytes[11]                    #Bytes indicando el numero de canales configurados
@@ -189,7 +189,7 @@ def __decodificar_medidas(trama_bytes):
     return valor
 
 
-def __decodificar_FechayHora(trama_bytes):
+def _decodificar_FechayHora(trama_bytes):
     #class datetime.datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0)  #Constructor de la clase datetime
     date = dt.datetime(trama_bytes[12] + 2000, trama_bytes[13], trama_bytes[14], trama_bytes[15], trama_bytes[16], trama_bytes[17])
     
@@ -216,7 +216,7 @@ def __decodificar_FechayHora(trama_bytes):
 ###########################################################################################################
 
 
-def __socket(dir_socket, trama, num_bytes):
+def _socket(dir_socket, trama, num_bytes):
     '''
 
     Parameters
@@ -261,7 +261,7 @@ def __socket(dir_socket, trama, num_bytes):
     return lectura
 
 
-def __serial(dir_serial, trama):
+def _serial(dir_serial, trama):
     '''
 
     Parameters
@@ -352,7 +352,7 @@ def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
     
     #Se define la trama que se va a enviar, en función de la información deseada
     if (modo == 1) | ((modo >= 12) & (modo <= 22)):
-        trama = __genera_trama(num_estacion, modo)
+        trama = _genera_trama(num_estacion, modo)
     else:
         print('Error en el modo seleccionado.\n')
         return -1
@@ -376,7 +376,7 @@ def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
             num_bytes = 193 #Según el protocolo de geonica, la trama recibida por la estacion es de 193 bytes (Esto no se cumple si se solicita sincronización de hora)
            
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = __socket((dir_socket, str(PORT)), trama, num_bytes)
+            lectura = _socket((dir_socket, str(PORT)), trama, num_bytes)
             
             #Lectura errónea
             if lectura == -1:
@@ -398,7 +398,7 @@ def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
                     return -1
             
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = __serial(dir_serie,trama)
+            lectura = _serial(dir_serie,trama)
             
             #Lectura errónea
             if lectura == -1:
@@ -414,7 +414,7 @@ def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
     #Tratamiento de la lectura de la estación
     
     #Se comprueba si la transmisión ha sido correcta
-    estado_recepcion = __comprobar_recepcion(lectura, num_estacion)
+    estado_recepcion = _comprobar_recepcion(lectura, num_estacion)
     
     '''
     En caso de que se produzca un error, se devuelve el número del error
@@ -428,12 +428,12 @@ def lee_canales_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
     #Si hay algo que leer...
     if lectura:
         #Obtencion de la fecha de la estación
-        fecha = __decodificar_FechayHora(lectura)
+        fecha = _decodificar_FechayHora(lectura)
         print('La fecha de la estación es: ')
         print(fecha + '\n')
         
         #Obtencion de las medidas instantáneas
-        medidas = __decodificar_medidas(lectura)
+        medidas = _decodificar_medidas(lectura)
         # print('Las medidas obtenidas son:\n')
         # print(medidas + '\n')
         
@@ -469,7 +469,7 @@ def sincronizar_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
     '''
     
     #Se define la trama que se va a enviar, en función de la información deseada
-    trama = __genera_trama(num_estacion, None, hora)
+    trama = _genera_trama(num_estacion, None, hora)
     
     #Se comprueba que la estación pertenece a las estaciones existentes
     if not num_estacion in Estaciones:
@@ -488,7 +488,7 @@ def sincronizar_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
                 
             num_bytes = 13 #Según el protocolo de geonica, la trama recibida por la estacion es de 13 bytes
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = __socket((dir_socket, str(PORT)), trama, num_bytes)
+            lectura = _socket((dir_socket, str(PORT)), trama, num_bytes)
             
             #Lectura errónea
             if lectura == -1:
@@ -511,7 +511,7 @@ def sincronizar_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
             
             
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = __serial(dir_serie,trama)
+            lectura = _serial(dir_serie,trama)
             
             #Lectura errónea
             if lectura == -1:
@@ -525,7 +525,7 @@ def sincronizar_estacion(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir
         return -1
     
     #Se compurba que la sincronización ha sido correcta
-    estado_recepcion = __comprobar_recepcion(lectura, num_estacion)
+    estado_recepcion = _comprobar_recepcion(lectura, num_estacion)
     if estado_recepcion == True:
         print('Fecha sincronizada.\n')
         return True
