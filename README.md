@@ -1,4 +1,4 @@
-# geonica-app
+# pygeonica
 
 Para instalarlo como paquete:
-`pip install git+https://github.com/isi-ies-group/geonica-app.git`
+`pip install git+https://github.com/isi-ies-group/pygeonica.git`
