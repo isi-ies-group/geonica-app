@@ -13,10 +13,10 @@ TIEMPO_ESPERA_DATOS : 0.5
 Estaciones:
     -
         Num: 316
-        IP: 138.4.46.
+        IP: 138.4.46.34
     -
-        Num: 2168
-        IP: 138.4.46.
+        Num: 2169
+        IP: 138.4.46.2
     -
         Num: 2171
-        IP: 138.4.46
+        IP: 138.4.46.83
