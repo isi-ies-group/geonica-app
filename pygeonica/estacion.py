@@ -71,13 +71,13 @@ def _comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano(
     estado = bool()
     
     if bytes_recibidos == 13:                                           #Respuesta indicando sincronizacion completada o error en la comunicación
-        if trama[:8] == _cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
+        if trama[:8] == _cabecera(numero_estacion):          #Comporbación de que la cabecera recibida es la correcta
             if (trama[11] == 4):                                                #Bits indicando el fin de la transmisión, sincronización completada
                 estado = True                                                         #Se devuelve un booleano indicando sincronización completada
             elif (trama[11] == 21):                                             #Error en la sincronización
                 return int.from_bytes(trama[10])                                    #Se devuelve el indicador del estado del error            
     elif bytes_recibidos == 193:            #Respuesta indicando las mediciones pedidas
-        if trama[:8] == _cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
+        if trama[:8] == _cabecera(numero_estacion):          #Comporbación de que la cabecera recibida es la correcta
                 estado = True
     else:
         estado = False                                                    #Estado de error
@@ -431,12 +431,12 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         #Obtencion de la fecha de la estación
         fecha = _decodificar_FechayHora(lectura)
         print('La fecha de la estación es: ')
-        print(fecha + '\n')
+        print(fecha)
         
         #Obtencion de las medidas instantáneas
         medidas = _decodificar_medidas(lectura)
         # print('Las medidas obtenidas son:\n')
-        # print(medidas + '\n')
+        # print(medidas)
         
     else:
         print("Error en la recepción.\n")
