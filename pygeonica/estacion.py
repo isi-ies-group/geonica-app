@@ -365,9 +365,9 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
     #Se compruba el modo de comunicación
     if modo_comm.lower() == 'socket':
         if dir_socket == None:
-            dir_socket == Estaciones[num_estacion]
+            dir_socket = Estaciones[num_estacion]
         #Se comprueba que dir_socket es válido
-        elif type(dir_socket) == str:
+        if type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
                 if (num < 0) | (num > 255):
@@ -482,7 +482,7 @@ def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie
         if dir_socket == None:
             dir_socket = Estaciones[num_estacion]
         #Se comprueba que dir_socket es válido
-        elif type(dir_socket) == str:
+        if type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
                 if (num < 0) | (num > 255):
