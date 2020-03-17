@@ -6,10 +6,17 @@
 
 BYTEORDER : big
 PASS : "geonica "
-NUMERO_ESTACION : 316
 NUMERO_USUARIO : 1
 PORT : 30000
 TIEMPO_RTS_ACTIVO : 0.1
 TIEMPO_ESPERA_DATOS : 0.5
-Estaciones: 316,2168,2171
-
+Estaciones:
+    -
+        Num: 316
+        IP: 138.4.46.34
+    -
+        Num: 2169
+        IP: 138.4.46.2
+    -
+        Num: 2171
+        IP: 138.4.46.83

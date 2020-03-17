@@ -29,16 +29,15 @@ try:
                                                                      #No se utiliza el BasicLoader debido a que interpreta todo como strings, con FullLoader los valores numéricos los intrepreta como int o float
 
 except yaml.YAMLError:
-    print ("Error in configuration file\n")
+    print ("Error in configuration file.\n")
     
 #Asignacion de valores a variables globales
-Estaciones = []
-for num in config['Estaciones'].split(','):
-    Estaciones.append(int(num))
+Estaciones = {}
+for estacion in config['Estaciones']:
+    Estaciones.update({estacion['Num'] : estacion['IP']})
     
 BYTEORDER = config['BYTEORDER']
 PASS = config['PASS']
-NUMERO_ESTACION = config['NUMERO_ESTACION']
 NUMERO_USUARIO = config['NUMERO_USUARIO']
 PORT = config['PORT']
 TIEMPO_RTS_ACTIVO = config['TIEMPO_RTS_ACTIVO'] 
@@ -72,13 +71,13 @@ def _comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano(
     estado = bool()
     
     if bytes_recibidos == 13:                                           #Respuesta indicando sincronizacion completada o error en la comunicación
-        if trama[:8] == _cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
+        if trama[:8] == _cabecera(numero_estacion):          #Comporbación de que la cabecera recibida es la correcta
             if (trama[11] == 4):                                                #Bits indicando el fin de la transmisión, sincronización completada
                 estado = True                                                         #Se devuelve un booleano indicando sincronización completada
             elif (trama[11] == 21):                                             #Error en la sincronización
                 return int.from_bytes(trama[10])                                    #Se devuelve el indicador del estado del error            
     elif bytes_recibidos == 193:            #Respuesta indicando las mediciones pedidas
-        if trama[:8] == _cabecera(numero_estacion, NUMERO_USUARIO):          #Comporbación de que la cabecera recibida es la correcta
+        if trama[:8] == _cabecera(numero_estacion):          #Comporbación de que la cabecera recibida es la correcta
                 estado = True
     else:
         estado = False                                                    #Estado de error
@@ -315,7 +314,7 @@ def _serial(dir_serial, trama):
 ###########################################################################################################
 
 
-def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
+def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
     '''
 
     Parameters
@@ -365,25 +364,27 @@ def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=N
     
     #Se compruba el modo de comunicación
     if modo_comm.lower() == 'socket':
+        if dir_socket == None:
+            dir_socket = Estaciones[num_estacion]
         #Se comprueba que dir_socket es válido
-        if not(dir_socket == None) & (type(dir_socket) == str):
+        if type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
-                if (num < 0) | (num > 255):
+                if (int(num) < 0) | (int(num) > 255):
                     print('Error en el formato de la dirrección IP.\n')
                     return -1
             
             num_bytes = 193 #Según el protocolo de geonica, la trama recibida por la estacion es de 193 bytes (Esto no se cumple si se solicita sincronización de hora)
            
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = _socket((dir_socket, str(PORT)), trama, num_bytes)
+            lectura = _socket((dir_socket, PORT), trama, num_bytes)
             
             #Lectura errónea
             if lectura == -1:
                 return -1
             
         else:
-            print('Por favor, indique una dirreción IP.\n')
+            print('Por favor, indique una dirreción IP válida.\n')
             return -1
         
     elif modo_comm.lower() == 'serial':
@@ -430,12 +431,12 @@ def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=N
         #Obtencion de la fecha de la estación
         fecha = _decodificar_FechayHora(lectura)
         print('La fecha de la estación es: ')
-        print(fecha + '\n')
+        print(fecha)
         
         #Obtencion de las medidas instantáneas
         medidas = _decodificar_medidas(lectura)
         # print('Las medidas obtenidas son:\n')
-        # print(medidas + '\n')
+        # print(medidas)
         
     else:
         print("Error en la recepción.\n")
@@ -445,7 +446,7 @@ def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=N
     return fecha, medidas
 
 
-def sincroniza_hora(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
+def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
     '''
 
     Parameters
@@ -478,24 +479,26 @@ def sincroniza_hora(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_sock
     
     #Se compruba el modo de comunicación
     if modo_comm.lower() == 'socket':
+        if dir_socket == None:
+            dir_socket = Estaciones[num_estacion]
         #Se comprueba que dir_socket es válido
-        if not(dir_socket == None) & (type(dir_socket) == str):
+        if type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
-                if (num < 0) | (num > 255):
+                if (int(num) < 0) | (int(num) > 255):
                     print('Error en el formato de la dirrección IP.\n')
                     return -1     
                 
             num_bytes = 13 #Según el protocolo de geonica, la trama recibida por la estacion es de 13 bytes
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = _socket((dir_socket, str(PORT)), trama, num_bytes)
+            lectura = _socket((dir_socket, PORT), trama, num_bytes)
             
             #Lectura errónea
             if lectura == -1:
                 return -1
             
         else:
-            print('Por favor, indique una dirreción IP.\n')
+            print('Por favor, indique una dirreción IP válida.\n')
             return -1
         
     elif modo_comm.lower() == 'serial':
