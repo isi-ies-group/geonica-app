@@ -370,7 +370,7 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         if type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
-                if (num < 0) | (num > 255):
+                if (int(num) < 0) | (int(num) > 255):
                     print('Error en el formato de la dirrección IP.\n')
                     return -1
             
@@ -485,7 +485,7 @@ def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie
         if type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
-                if (num < 0) | (num > 255):
+                if (int(num) < 0) | (int(num) > 255):
                     print('Error en el formato de la dirrección IP.\n')
                     return -1     
                 
