@@ -29,16 +29,15 @@ try:
                                                                      #No se utiliza el BasicLoader debido a que interpreta todo como strings, con FullLoader los valores numéricos los intrepreta como int o float
 
 except yaml.YAMLError:
-    print ("Error in configuration file\n")
+    print ("Error in configuration file.\n")
     
 #Asignacion de valores a variables globales
-Estaciones = []
-for num in config['Estaciones'].split(','):
-    Estaciones.append(int(num))
+Estaciones = {}
+for estacion in config['Estaciones']:
+    Estaciones.update({estacion['Num'] : estacion['IP']})
     
 BYTEORDER = config['BYTEORDER']
 PASS = config['PASS']
-NUMERO_ESTACION = config['NUMERO_ESTACION']
 NUMERO_USUARIO = config['NUMERO_USUARIO']
 PORT = config['PORT']
 TIEMPO_RTS_ACTIVO = config['TIEMPO_RTS_ACTIVO'] 
@@ -315,7 +314,7 @@ def _serial(dir_serial, trama):
 ###########################################################################################################
 
 
-def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
+def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
     '''
 
     Parameters
@@ -365,8 +364,10 @@ def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=N
     
     #Se compruba el modo de comunicación
     if modo_comm.lower() == 'socket':
+        if dir_socket == None:
+            dir_socket == Estaciones[num_estacion]
         #Se comprueba que dir_socket es válido
-        if not(dir_socket == None) & (type(dir_socket) == str):
+        elif type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
                 if (num < 0) | (num > 255):
@@ -383,7 +384,7 @@ def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=N
                 return -1
             
         else:
-            print('Por favor, indique una dirreción IP.\n')
+            print('Por favor, indique una dirreción IP válida.\n')
             return -1
         
     elif modo_comm.lower() == 'serial':
@@ -445,7 +446,7 @@ def lee_canales(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=N
     return fecha, medidas
 
 
-def sincroniza_hora(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
+def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
     '''
 
     Parameters
@@ -478,8 +479,10 @@ def sincroniza_hora(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_sock
     
     #Se compruba el modo de comunicación
     if modo_comm.lower() == 'socket':
+        if dir_socket == None:
+            dir_socket == Estaciones[num_estacion]
         #Se comprueba que dir_socket es válido
-        if not(dir_socket == None) & (type(dir_socket) == str):
+        elif type(dir_socket) == str:
             #Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
                 if (num < 0) | (num > 255):
@@ -495,7 +498,7 @@ def sincroniza_hora(num_estacion = NUMERO_ESTACION, modo_comm='socket', dir_sock
                 return -1
             
         else:
-            print('Por favor, indique una dirreción IP.\n')
+            print('Por favor, indique una dirreción IP válida.\n')
             return -1
         
     elif modo_comm.lower() == 'serial':
