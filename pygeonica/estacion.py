@@ -13,6 +13,7 @@ import struct
 import yaml
 import os
 from pathlib import Path
+from bbdd import get_channels_config
 
 
 ###########################################################################################################
@@ -442,8 +443,12 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         print("Error en la recepción.\n")
         return -1
     
+    #Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
+    canales = get_channels_config(num_estacion)
+    res = dict(zip(canales,medidas))
+    
     #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas
-    return fecha, medidas
+    return fecha, res
 
 
 def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
