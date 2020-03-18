@@ -30,7 +30,7 @@ install_requires = [
     'pandas',
     'datetime',
     'pyyaml',
-    'os'
+    'os',
     'pytz',
     'pathlib',
     'pyserial'
