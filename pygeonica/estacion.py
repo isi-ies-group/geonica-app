@@ -13,7 +13,7 @@ import struct
 import yaml
 import os
 from pathlib import Path
-from bbdd.py import get_channels_config
+from .. import bbdd
 
 
 ###########################################################################################################
@@ -444,7 +444,7 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         return -1
     
     #Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
-    canales = get_channels_config(num_estacion)
+    canales = bbdd.get_channels_config(num_estacion)
     res = dict(zip(canales,medidas))
     
     #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas
