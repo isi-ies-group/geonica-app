@@ -13,7 +13,7 @@ import struct
 import yaml
 import os
 from pathlib import Path
-from .. import bbdd
+from . import bbdd
 
 
 ###########################################################################################################
