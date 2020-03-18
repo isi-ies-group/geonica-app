@@ -13,7 +13,7 @@ import struct
 import yaml
 import os
 from pathlib import Path
-from bbdd import get_channels_config
+from bbdd.py import get_channels_config
 
 
 ###########################################################################################################
