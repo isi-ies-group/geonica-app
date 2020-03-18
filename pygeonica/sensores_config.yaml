@@ -1,0 +1,99 @@
+######################
+##  IMPORTANTE:
+##      
+##      El separador decimal debe ser el punto '.'
+##      Si en el valor hay algo mas aparte de un número, se intepretará como un string de caracteres.
+##      En el caso de que haya una casilla vacía, se le asignará el valor None.
+##
+######################
+
+Servidor:
+    IP: 138.4.46.69
+    Puerto: 49172  
+    Nombre: MeteoStation4k    
+    Usuario: Geonica
+    Contrasena: g30n1c4
+    
+BBDD:
+    Nombre: MeteoStation4k    
+    Usuario: Geonica
+    Contrasena: g30n1c4
+    Database: GEONICASUITE4  K
+
+Estaciones:
+    -
+        Numero: 316
+        IP: 138.4.46.34
+        Canales: 17
+        Nombre: IES-ISI1
+    -
+        Numero: 2169
+        IP: 138.4.46.2
+        Canales: 17
+        Nombre: IES-ISI2
+
+Sensores:
+    -
+        Info:
+            Marca: WindoSonic
+            Modelo:
+            NumSerie:
+            Tipo: Termopila
+        NumEstacion: 316
+        NumCanal_Logico: 1
+        NumCanal_Fisico: A01
+        Nombre_Parametro: Temp. Ai 1
+        Configuracion:
+            Sensibilidad:
+            Sensibilidad_unidad: 
+            Constante: 1
+            Funcion_Matematica: YSI44031
+        Etiqueta: Temp
+    -
+        Info:
+            Marca: EPPLEY
+            Modelo: NIP
+            NumSerie: 3452E6
+            Tipo: Pirheliometro
+        NumEstacion: 316
+        NumCanal_Logico: 2
+        NumCanal_Fisico: A02
+        Nombre_Parametro: R.Directa1
+        Configuracion:
+            Sensibilidad: 7.79
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 128.5347
+            Funcion_Matematica:
+        Etiqueta: Datos Seg
+    -
+        Info:
+            Marca: EPPLEY
+            Modelo: PSP
+            NumSerie: 15426F3
+            Tipo: Piranometro
+        NumEstacion: 316
+        NumCanal_Logico: 3
+        NumCanal_Fisico: A03
+        Nombre_Parametro: PIRAN.1
+        Configuracion:
+            Sensibilidad: 7.85
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 127.3885
+            Funcion_Matematica:
+        Etiqueta: Pirano 1
+    -
+        Info:
+            Marca: KIPP & ZONEN
+            Modelo: CM11
+            NumSerie: CM11882151
+            Tipo: Piranometro
+        NumEstacion: 316
+        NumCanal_Logico: 4
+        NumCanal_Fisico: A04
+        Nombre_Parametro: PIRAN.2
+        Configuracion:
+            Sensibilidad: 4.89
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 204.499
+            Funcion_Matematica:
+        Etiqueta: Pirano 2
