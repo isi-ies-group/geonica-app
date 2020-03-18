@@ -10,6 +10,7 @@ import socket
 import time
 import datetime as dt
 import struct
+import pandas as pd
 import yaml
 import os
 from pathlib import Path
@@ -444,7 +445,7 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         return -1
     
     #Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
-    canales = bbdd.get_channels_config(num_estacion)
+    canales = bbdd.get_channels_config(num_estacion)['Abreviatura'].tolist()
     res = dict(zip(canales,medidas))
     
     #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas
