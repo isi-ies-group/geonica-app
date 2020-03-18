@@ -4,10 +4,11 @@ Created on Fri Mar  6 11:30:00 2020
 
 @author: Martin
 """
-import setuptools
 
-setuptools.setup(
-    name="pygeonica", # Replace with your own username
+from setuptools import setup
+
+setup_args = dict(
+    name="pygeonica",
     version="0.1",
     url='http://github.com/isi-ies-group/pygeonica',
     author="Martin",
@@ -23,3 +24,18 @@ setuptools.setup(
     package_data={'': ['*.txt','*.yaml']},
     include_package_data=True,
 )
+
+install_requires = [
+    'pyodbc',
+    'pandas',
+    'datetime',
+    'pyyaml',
+    'os'
+    'pytz',
+    'pathlib',
+    'pyserial'
+]
+
+if __name__ == '__main__':
+    setup(**setup_args, install_requires=install_requires)
+
