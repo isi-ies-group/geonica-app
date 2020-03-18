@@ -70,10 +70,7 @@ def get_data_raw(numero_estacion, fecha_ini, fecha_fin = dt.date.today().strftim
             "Fecha < '" + fecha_fin + "'"
     ) #Se solicitan las medidas, junto son su correspondiende NumParámetro, de un periodo determinado
     
-    data_raw = (
-            pd.read_sql(query_data, pyodbc.connect(request))
-            .pivot_table(index='Fecha', columns=['NumParametro'], values='Valor')
-    ) #Se construye el DataFrame con los valores pedidos a la base de datos
+    data_raw = pd.read_sql(query_data, pyodbc.connect(request))#Se construye el DataFrame con los valores pedidos a la base de datos
     
     return data_raw
 
@@ -214,7 +211,7 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
 
         # Cambia codigo NumParametro de BBDD a su nombre de fichero
         
-        data_channels = get_parameters(SERVER_ADDRESS).set_index('NumParametro') #Se obtienen los números de los parámetros...
+        data_channels = get_parameters().set_index('NumParametro') #Se obtienen los números de los parámetros...
         data.rename(columns = data_channels['Abreviatura'], inplace=True) #... y se sustituye el NumParametro por el Nombre
         
     # cambia index a hora civil
