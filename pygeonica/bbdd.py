@@ -7,6 +7,7 @@ import pyodbc
 import pandas as pd
 import datetime as dt
 import yaml
+import csv
 import os
 import pytz
 from pathlib import Path
@@ -21,6 +22,8 @@ try:
         config = yaml.load(config_file, Loader = yaml.FullLoader) #Se utiliza el FullLoader para evitar un mensaje de advertencia, ver https://msg.pyyaml.org/load para mas información
         servidor = config['Servidor']                             #No se utiliza el BasicLoader debido a que interpreta todo como strings, con FullLoader los valores numéricos los intrepreta como int o float
         bbdd = config['BBDD']
+        file = config['File']
+        dict_renombrar = config['Dict_Rename']
         del config                       
 
 except yaml.YAMLError:
@@ -32,7 +35,9 @@ DDBB_name = bbdd['Database']
 database = bbdd['Nombre']    #Nombre por defecto que se le asigna a la base de datos
 username = bbdd['Usuario']            #Usuario por defecto
 password = bbdd['Contrasena']            #Contraseña por defecto
-    
+
+DEFAULT_NAME = file['Nombre']
+DEFAUL_PATH = file['Path']
     
 
 # pyodbc.drivers() # lista de drivers disponibles
@@ -247,3 +252,98 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
     data['yyyy/mm/dd hh:mm'] = [d.strftime('%Y/%m/%d %H:%M') for d in data.index]
 
     return data
+
+
+def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_fichero=DEFAUL_PATH):
+    '''
+    
+    Parameters
+    ----------
+    dia_inicial : str(AAAA-MM-DD) o datetime-like
+    dia_final : str(AAAA-MM-DD) o datetime-like, optional
+        Por defecto es el día antetior.
+    nombre_fichero : string, optional
+        Por defecto es: meteoAAAA_MM_DD
+    path : string, optional
+        Rellenar en el caso de que el usuario
+        del script no sea el servidor.
+
+    Returns
+    -------
+    bool
+        True: Fichero creado correctamente
+        False: Error en la función
+
+    '''
+    
+    #Si no se indica fecha del final del peridod deseado,
+    #se reciben los datos hasta el día anterior
+    if dia_final == None:
+        dia_final = dt.date.today() - dt.timedelta(days=1)
+
+    #En caso de no indicarse ningun nombre de fichero:
+    if nombre_fichero == None:
+        nombre_fichero = DEFAULT_NAME
+    
+    
+    # %% Generación fichero llamando a función lee_dia_geonica_ddbb(dia, lista_campos)
+    
+    # Se llama tantas veces a la funcion lee_dia_geonica_ddbb() como días haya en el perido indicado
+    frames = []
+    for d in pd.date_range(start=dia_inicial, end=dia_final):
+        dia = d.date()
+        
+        # Lee BBDD y obtiene datos del dia
+        data_316 = lee_dia_geonica_ddbb(dia, 316)
+        data_2169 = lee_dia_geonica_ddbb(dia, 2169)
+        #Para que no se produzcan errorres, se asigna el sufijo "_2" a los parámetros de la estacion 2169 que se repetan en ambas estaciones.
+        data_i = data_316.join(data_2169, rsuffix='_2')
+        
+        frames.append(data_i)
+    
+    #Finalmente se concatenan los datos de cada día para formar el DataFrame del periodo completo
+    data = pd.concat(frames)
+    #Como la fecha y la hora son columnas compartidas, e idénticas, se elimina los duplicados y canales innecesarios.
+    data.drop(columns={'yyyy/mm/dd hh:mm_2', 'VRef Ext.', 'Bateria', 'Bateria_2', 'Est.Geo3K', 'Est.Geo3K_2'}, inplace=True)
+    
+    data.rename(columns=dict_renombrar, inplace=True)
+    
+    # Crear fichero .txt
+    # Escribe la cabecera. Pandas utiliza el index standard de tipo datenum y solo
+    # crea una columna y no dos como se usa normalmente con estos ficheros, por lo
+    # que se escribe antes manualmente
+    formato_fecha = '%Y_%m_%d'
+    nombre_fichero_texto = path_fichero + nombre_fichero + \
+        dia.strftime(formato_fecha) + '.txt'
+    
+    with open(nombre_fichero_texto, 'w', newline='') as f:
+        a = csv.writer(f, delimiter='\t')
+        a.writerow(data.columns)
+    
+    # Escribe los datos seleccionados en cols en modo append sin cabecera ni index
+    data.to_csv(nombre_fichero_texto, columns=data.columns, mode='a', sep='\t',
+                float_format='%.3f', header=False, index=False, na_rep='NaN')
+    
+    print('Ha escrito fichero ' + nombre_fichero_texto)
+    
+    # %% Grafica
+    '''
+    plt.figure(figsize=(8, 6))
+    plt.title('DNI+isotpyes - ' + nombre_fichero +
+              dia.strftime(formato_fecha))
+    plt.grid(which='minor')
+    plt.ylabel('Irradiance $\mathregular{[W·m^{-2}]}$')
+    data.Top.plot(legend=True)
+    data.Mid.plot(legend=True)
+    data.Bot.plot(legend=True)
+    data.Rad_Dir.plot(legend=True)
+    plt.ylim([0, 1100])
+    
+    nombre_fichero_imagen = path_fichero + 'img/' + \
+        nombre_fichero + dia.strftime(formato_fecha) + '.png'
+    plt.savefig(nombre_fichero_imagen)
+    
+    print('Ha escrito fichero ' + nombre_fichero_imagen)
+    '''
+    
+    return True

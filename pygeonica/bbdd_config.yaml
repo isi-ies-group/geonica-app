@@ -13,3 +13,18 @@ BBDD:
     Usuario: Geonica
     Contrasena: g30n1c4
     Database: GEONICASUITE4  K
+
+File:
+    Nombre: meteo
+    Path: "D:/datos/Datos Meteo IES/"
+    
+Dict_Rename:
+    "Estado" : Limpieza
+    "PIRAN.1" : Gh                  # Global Horizontal
+    "PIRAN.2" : Dh                  # Difusa Horizontal
+    "PIRAN.3" : G(41)               # Global 41ยบ
+    "PIRAN.4" : Gn                  # Global Normal
+    "R.Directa1" : Bn               # Directa Normal
+    "R.Directa2" : Bn_2             # Directa Normal 2
+    "R.Infr.Inc" : Pirgeo           # Pirgeometro
+    "T.Carcasa" : Temp_Pirgeo       # Temperatura Carcasa Pirgeometro
