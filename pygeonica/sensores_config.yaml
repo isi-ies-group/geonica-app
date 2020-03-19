@@ -35,10 +35,26 @@ Estaciones:
 Sensores:
     -
         Info:
-            Marca: WindoSonic
+            Marca: KIP & ZONEN
+            Modelo: CM11
+            NumSerie: CM11882151
+            Tipo: Piranometro
+        NumEstacion:
+        NumCanal_Logico:
+        NumCanal_Fisico:
+        Nombre_Parametro:
+        Configuracion:
+            Sensibilidad: 4.89
+            Sensibilidad_unidad:  uV(W/m2)
+            Constante: 204,498977
+            Funcion_Matematica:
+        Etiqueta: Pirano
+    -
+        Info:
+            Marca: YOUNG
             Modelo:
             NumSerie:
-            Tipo: Termopila
+            Tipo: Sonda Temp
         NumEstacion: 316
         NumCanal_Logico: 1
         NumCanal_Fisico: A01
@@ -83,17 +99,177 @@ Sensores:
         Etiqueta: Pirano 1
     -
         Info:
-            Marca: KIPP & ZONEN
-            Modelo: CM11
-            NumSerie: CM11882151
+            Marca: EPPLEY
+            Modelo: PSP
+            NumSerie: 18565F3
             Tipo: Piranometro
         NumEstacion: 316
         NumCanal_Logico: 4
         NumCanal_Fisico: A04
         Nombre_Parametro: PIRAN.2
         Configuracion:
-            Sensibilidad: 4.89
+            Sensibilidad: 8.92
             Sensibilidad_unidad: uV(W/m2)
-            Constante: 204.499
+            Constante: 112.1076
             Funcion_Matematica:
         Etiqueta: Pirano 2
+    -
+        Info:
+            Marca:
+            Modelo:
+            NumSerie:
+            Tipo:
+        NumEstacion: 316
+        NumCanal_Logico: 5,6,7
+        NumCanal_Fisico: A05,A06,A07
+        Nombre_Parametro: Celula Top, Celula Mid, Celula Bot
+        Configuracion:
+            Sensibilidad:
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 13.4479, 13.22984, 15.67062
+            Funcion_Matematica:
+        Etiqueta: TRIT REF
+    -
+        Info:
+            Marca: YOUNG
+            Modelo: 61302L
+            NumSerie: BP21143
+            Tipo: Barometro
+        NumEstacion: 316
+        NumCanal_Logico: 11
+        NumCanal_Fisico: A11
+        Nombre_Parametro: Presion
+        Configuracion:
+            Sensibilidad:
+            Sensibilidad_unidad:
+            Constante:
+            Funcion_Matematica:
+        Etiqueta: Pt ATM
+    -
+        Info:
+            Marca: WINDSONIC
+            Modelo:
+            NumSerie: CM11882151
+            Tipo: Anemometro
+        NumEstacion: 316
+        NumCanal_Logico: 12,13
+        NumCanal_Fisico: 
+        Nombre_Parametro: V.Vien. 1, D.Vien. 1
+        Configuracion:
+            Sensibilidad:
+            Sensibilidad_unidad:
+            Constante:
+            Funcion_Matematica:
+        Etiqueta: Viento VEL_DIR
+    -
+        Info:
+            Marca: GEONICA
+            Modelo:
+            NumSerie:
+            Tipo: Sonda Temp+RH
+        NumEstacion: 2169
+        NumCanal_Logico: 1,2
+        NumCanal_Fisico: A01,A02
+        Nombre_Parametro: Temp. Ai 2, Hum. Rel
+        Configuracion:
+            Sensibilidad:
+            Sensibilidad_unidad:
+            Constante:
+            Funcion_Matematica: YSI44031
+        Etiqueta: T.amb + RH
+    -
+        Info:
+            Marca: KIPP & ZONEN
+            Modelo: CH1 NIP
+            NumSerie: CH11930035
+            Tipo: Pirheliometro
+        NumEstacion: 2169
+        NumCanal_Logico: 3
+        NumCanal_Fisico: A03
+        Nombre_Parametro: R.Directa2
+        Configuracion:
+            Sensibilidad: 7.63
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 131.0615989
+            Funcion_Matematica:
+        Etiqueta: Pirhelio K&Z
+    -
+        Info:
+            Marca: EPPLEY
+            Modelo: PSP
+            NumSerie: 18564F3
+            Tipo: Piranometro
+        NumEstacion: 2169
+        NumCanal_Logico: 4
+        NumCanal_Fisico: A04
+        Nombre_Parametro: PIRAN.3
+        Configuracion:
+            Sensibilidad: 7.82
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 127.8772378
+            Funcion_Matematica:
+        Etiqueta: Pirano 3
+    -
+        Info:
+            Marca: LI-COR
+            Modelo: LI-2000
+            NumSerie: PY74650
+            Tipo: Piranometro
+        NumEstacion: 2169
+        NumCanal_Logico: 5
+        NumCanal_Fisico: A08
+        Nombre_Parametro: PIRAN.4
+        Configuracion:
+            Sensibilidad: 76.45
+            Sensibilidad_unidad: (W/m2)/mV
+            Constante: 76.45
+            Funcion_Matematica:
+        Etiqueta: Pirano 4(Corriente)
+    -
+        Info:
+            Marca: KIPP & ZONEN
+            Modelo: CGR3
+            NumSerie: 190440
+            Tipo: Pirgeometro
+        NumEstacion: 2169
+        NumCanal_Logico: 6, 8(Temperatura)
+        NumCanal_Fisico: A05, A06
+        Nombre_Parametro: R.Infr.Inc
+        Configuracion:
+            Sensibilidad: 13.3
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 75.1879699
+            Funcion_Matematica:
+        Etiqueta: Pirgeometro
+    -
+        Info:
+            Marca: WINDSONIC
+            Modelo:
+            NumSerie:
+            Tipo: Anemometro
+        NumEstacion: 2169
+        NumCanal_Logico: 10, 11
+        NumCanal_Fisico:
+        Nombre_Parametro: V.Vien.2, D.Vien.2
+        Configuracion:
+            Sensibilidad:
+            Sensibilidad_unidad:
+            Constante:
+            Funcion_Matematica:
+        Etiqueta: Viento VEL_DIR
+    -
+        Info:
+            Marca: PRONAMIC
+            Modelo: DK-8600
+            NumSerie:
+            Tipo: Pluviometro
+        NumEstacion: 2169
+        NumCanal_Logico: 12
+        NumCanal_Fisico: CP1B
+        Nombre_Parametro: Lluvia
+        Configuracion:
+            Sensibilidad:
+            Sensibilidad_unidad:
+            Constante:
+            Funcion_Matematica:
+        Etiqueta: Pluviometro
