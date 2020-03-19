@@ -377,9 +377,14 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
                     return -1
             
             num_bytes = 193 #Según el protocolo de geonica, la trama recibida por la estacion es de 193 bytes (Esto no se cumple si se solicita sincronización de hora)
-           
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = _socket((dir_socket, PORT), trama, num_bytes)
+            #Se intenta realizar la comunicación hasta un número máximo de intentos(5)
+            lectura = []
+            intentos = 0
+            while len(lectura) != num_bytes:
+                lectura = _socket((dir_socket, PORT), trama, num_bytes)
+                if (intentos > 5) | (lectura == -1):
+                    break
             
             #Lectura errónea
             if lectura == -1:
@@ -497,7 +502,13 @@ def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie
                 
             num_bytes = 13 #Según el protocolo de geonica, la trama recibida por la estacion es de 13 bytes
             #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = _socket((dir_socket, PORT), trama, num_bytes)
+            #Se intenta realizar la comunicación hasta un número máximo de intentos(5)
+            lectura = []
+            intentos = 0
+            while len(lectura) != num_bytes:
+                lectura = _socket((dir_socket, PORT), trama, num_bytes)
+                if (intentos > 5) | (lectura == -1):
+                    break
             
             #Lectura errónea
             if lectura == -1:

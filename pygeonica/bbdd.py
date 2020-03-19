@@ -152,7 +152,7 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
     # disponibles de la estación
     if lista_campos == None:
         lista_campos = ['yyyy/mm/dd hh:mm']
-        canales = get_channels_config(SERVER_ADDRESS, 316)['Abreviatura'].tolist()
+        canales = get_channels_config(numero_estacion)['Abreviatura'].tolist()
         lista_campos += canales
     
     dia_datetime = dt.datetime.combine(dia, dt.datetime.min.time())
