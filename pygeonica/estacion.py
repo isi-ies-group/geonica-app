@@ -237,10 +237,13 @@ def _socket(dir_socket, trama, num_bytes):
     #Se crear el scoket y se conceta con la estación
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(('',0))
+    except socket.error as err:
+        print('Error en la creación del socket.\n %s' %(err))
+        return -1
+    try:
         sock.connect(dir_socket)
-    except:
-        print('Error en la creación/conexión del socket.\n')
+    except socket.error as err:
+        print('Error en la conexión del socket.\n %s' %(err))
         return -1
     
     #Se envía la trama a la estación
@@ -248,6 +251,7 @@ def _socket(dir_socket, trama, num_bytes):
     
     #Se espera hasta que se reciban el numero de bytes deseados
     try:
+        time.sleep(2 * TIEMPO_ESPERA_DATOS)
         sock.settimeout(5 * TIEMPO_ESPERA_DATOS)
         lectura = sock.recv(num_bytes)
     except:
@@ -383,6 +387,7 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
             intentos = 0
             while len(lectura) != num_bytes:
                 lectura = _socket((dir_socket, PORT), trama, num_bytes)
+                intentos += 1
                 if (intentos > 5) | (lectura == -1):
                     break
             
@@ -507,6 +512,7 @@ def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie
             intentos = 0
             while len(lectura) != num_bytes:
                 lectura = _socket((dir_socket, PORT), trama, num_bytes)
+                intentos += 1
                 if (intentos > 5) | (lectura == -1):
                     break
             
