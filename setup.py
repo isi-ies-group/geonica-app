@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup_args = dict(
     name="pygeonica",
-    version="0.1",
+    version="0.1.1",
     url='http://github.com/isi-ies-group/pygeonica',
     author="Martin",
     author_email="m.nenkov@alumnos.upm.es",
