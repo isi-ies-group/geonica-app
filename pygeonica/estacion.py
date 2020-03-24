@@ -77,7 +77,7 @@ def _comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano(
             if (trama[11] == 4):                                                #Bits indicando el fin de la transmisión, sincronización completada
                 estado = True                                                         #Se devuelve un booleano indicando sincronización completada
             elif (trama[11] == 21):                                             #Error en la sincronización
-                return int.from_bytes(trama[10])                                    #Se devuelve el indicador del estado del error            
+                return int.from_bytes(trama[10], byteorder=BYTEORDER)               #Se devuelve el indicador del estado del error            
     elif bytes_recibidos == 193:            #Respuesta indicando las mediciones pedidas
         if trama[:8] == _cabecera(numero_estacion):          #Comporbación de que la cabecera recibida es la correcta
                 estado = True
