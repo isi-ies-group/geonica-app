@@ -134,41 +134,42 @@ def _visulizar_trama(trama_bytes):
     return trama
 
 
-def _genera_trama(numero_estacion, comando, hora = dt.datetime.now()):
-    if type(comando) == int: #Se pide una medida
-        DLE = bytes(chr(16), encoding='ascii')
-        SYN = bytes(chr(22), encoding='ascii')
-        E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
-        comando_sinc = bytes(chr(1), encoding='ascii') # 1: codigo sync petición de medidas instantáneas
-        U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)
-        X = 14 * b'\x00'
-        ctrl = b'\xFF' +  b'\xFF'# Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
-        pasw = bytes(PASS, encoding='ascii')
-        ENQ = bytes(chr(5), encoding='ascii')
-        
-        trama = DLE + SYN + E + comando_sinc + U + X + ctrl + pasw + ENQ
+def _genera_trama(numero_estacion, comando):
+    DLE = bytes(chr(16), encoding='ascii')
+    SYN = bytes(chr(22), encoding='ascii')
+    E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
+    comando_comm = bytes(chr(comando), encoding='ascii')
+    U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)
+    X = 14 * b'\x00'
+    ctrl = b'\xFF' +  b'\xFF'# Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
+    pasw = bytes(PASS, encoding='ascii')
+    ENQ = bytes(chr(5), encoding='ascii')
     
-    else: #En caso de que sea cualquier otra cosa, se sinroniza la hora
-        DLE = bytes(chr(16), encoding='ascii')
-        SYN = bytes(chr(22), encoding='ascii')
-        E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
-        comando_sinc = bytes(chr(0), encoding='ascii') # 0: codigo sync hora
-        U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)
-        A = (hora.year - 2000).to_bytes(1, byteorder=BYTEORDER)        
-        M = hora.month.to_bytes(1, byteorder=BYTEORDER)
-        D = hora.day.to_bytes(1, byteorder=BYTEORDER)
-        d = hora.isoweekday().to_bytes(1, byteorder=BYTEORDER)
-        H = hora.hour.to_bytes(1, byteorder=BYTEORDER)
-        m = hora.minute.to_bytes(1, byteorder=BYTEORDER)
-        s = hora.second.to_bytes(1, byteorder=BYTEORDER)
-        X = 7 * b'\x00'
-        ctrl = b'\xFF' +  b'\xFF'# Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
-        pasw = bytes(PASS, encoding='ascii')
-        ENQ = bytes(chr(5), encoding='ascii')
+    trama = DLE + SYN + E + comando_comm + U + X + ctrl + pasw + ENQ
+
+    return trama
+    
+    
+def _genera_trama_sincronizar(numero_estacion, hora):
+    DLE = bytes(chr(16), encoding='ascii')
+    SYN = bytes(chr(22), encoding='ascii')
+    E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
+    comando_sinc = bytes(chr(0), encoding='ascii') # 0: codigo sync hora
+    U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)
+    A = (hora.year - 2000).to_bytes(1, byteorder=BYTEORDER)        
+    M = hora.month.to_bytes(1, byteorder=BYTEORDER)
+    D = hora.day.to_bytes(1, byteorder=BYTEORDER)
+    d = hora.isoweekday().to_bytes(1, byteorder=BYTEORDER)
+    H = hora.hour.to_bytes(1, byteorder=BYTEORDER)
+    m = hora.minute.to_bytes(1, byteorder=BYTEORDER)
+    s = hora.second.to_bytes(1, byteorder=BYTEORDER)
+    X = 7 * b'\x00'
+    ctrl = b'\xFF' +  b'\xFF'# Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
+    pasw = bytes(PASS, encoding='ascii')
+    ENQ = bytes(chr(5), encoding='ascii')
+    
+    trama = DLE + SYN + E + comando_sinc + U + A + M + D + d + H + m + s + X + ctrl + pasw + ENQ
         
-        trama = DLE + SYN + E + comando_sinc + U + A + M + D + d + H + m + s + X + ctrl + pasw + ENQ
-        
-    #Se devuelve a trama que se debe enviar
     return trama
 
 
@@ -462,7 +463,7 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
     return fecha, res
 
 
-def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, hora=dt.datetime.now()):
+def sincroniza_hora(num_estacion, hora, modo_comm='socket', dir_socket=None, dir_serie=None):
     '''
 
     Parameters
@@ -475,8 +476,7 @@ def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie
         Por defecto es None.
     dir_serie : str, opcional
         Por defecto es None.
-    hora : dt.datetime, opcional
-        Por defecto es la hora actual.
+    hora : dt.datetime
     Returns
     -------
     esatdo_recepcion
@@ -486,7 +486,7 @@ def sincroniza_hora(num_estacion, modo_comm='socket', dir_socket=None, dir_serie
     '''
     
     #Se define la trama que se va a enviar, en función de la información deseada
-    trama = _genera_trama(num_estacion, None, hora)
+    trama = _genera_trama_sincronizar(num_estacion, hora)
     
     #Se comprueba que la estación pertenece a las estaciones existentes
     if not num_estacion in Estaciones:
