@@ -37,7 +37,7 @@ username = bbdd['Usuario']            #Usuario por defecto
 password = bbdd['Contrasena']            #Contraseña por defecto
 
 DEFAULT_NAME = file['Nombre']
-DEFAUL_PATH = file['Path']
+DEFAULT_PATH = file['Path']
     
 
 # pyodbc.drivers() # lista de drivers disponibles
@@ -254,7 +254,7 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
     return data
 
 
-def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_fichero=DEFAUL_PATH):
+def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_fichero=DEFAULT_PATH):
     '''
     
     Parameters
