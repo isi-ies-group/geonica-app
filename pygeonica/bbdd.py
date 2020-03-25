@@ -289,7 +289,6 @@ def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_
     # %% Generación fichero llamando a función lee_dia_geonica_ddbb(dia, lista_campos)
     
     # Se llama tantas veces a la funcion lee_dia_geonica_ddbb() como días haya en el perido indicado
-    frames = []
     for d in pd.date_range(start=dia_inicial, end=dia_final):
         dia = d.date()
         
@@ -297,53 +296,49 @@ def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_
         data_316 = lee_dia_geonica_ddbb(dia, 316)
         data_2169 = lee_dia_geonica_ddbb(dia, 2169)
         #Para que no se produzcan errorres, se asigna el sufijo "_2" a los parámetros de la estacion 2169 que se repetan en ambas estaciones.
-        data_i = data_316.join(data_2169, rsuffix='_2')
+        data = data_316.join(data_2169, rsuffix='_2')
+            
+        #Como la fecha y la hora son columnas compartidas, e idénticas, se elimina los duplicados y canales innecesarios.
+        data.drop(columns={'yyyy/mm/dd hh:mm_2', 'VRef Ext.', 'Bateria', 'Bateria_2', 'Est.Geo3K', 'Est.Geo3K_2'}, inplace=True)
         
-        frames.append(data_i)
-    
-    #Finalmente se concatenan los datos de cada día para formar el DataFrame del periodo completo
-    data = pd.concat(frames)
-    #Como la fecha y la hora son columnas compartidas, e idénticas, se elimina los duplicados y canales innecesarios.
-    data.drop(columns={'yyyy/mm/dd hh:mm_2', 'VRef Ext.', 'Bateria', 'Bateria_2', 'Est.Geo3K', 'Est.Geo3K_2'}, inplace=True)
-    
-    data.rename(columns=dict_renombrar, inplace=True)
-    
-    # Crear fichero .txt
-    # Escribe la cabecera. Pandas utiliza el index standard de tipo datenum y solo
-    # crea una columna y no dos como se usa normalmente con estos ficheros, por lo
-    # que se escribe antes manualmente
-    formato_fecha = '%Y_%m_%d'
-    nombre_fichero_texto = path_fichero + nombre_fichero + \
-        dia.strftime(formato_fecha) + '.txt'
-    
-    with open(nombre_fichero_texto, 'w', newline='') as f:
-        a = csv.writer(f, delimiter='\t')
-        a.writerow(data.columns)
-    
-    # Escribe los datos seleccionados en cols en modo append sin cabecera ni index
-    data.to_csv(nombre_fichero_texto, columns=data.columns, mode='a', sep='\t',
-                float_format='%.3f', header=False, index=False, na_rep='NaN')
-    
-    print('Ha escrito fichero ' + nombre_fichero_texto)
-    
-    # %% Grafica
-    '''
-    plt.figure(figsize=(8, 6))
-    plt.title('DNI+isotpyes - ' + nombre_fichero +
-              dia.strftime(formato_fecha))
-    plt.grid(which='minor')
-    plt.ylabel('Irradiance $\mathregular{[W·m^{-2}]}$')
-    data.Top.plot(legend=True)
-    data.Mid.plot(legend=True)
-    data.Bot.plot(legend=True)
-    data.Rad_Dir.plot(legend=True)
-    plt.ylim([0, 1100])
-    
-    nombre_fichero_imagen = path_fichero + 'img/' + \
-        nombre_fichero + dia.strftime(formato_fecha) + '.png'
-    plt.savefig(nombre_fichero_imagen)
-    
-    print('Ha escrito fichero ' + nombre_fichero_imagen)
-    '''
+        data.rename(columns=dict_renombrar, inplace=True)
+        
+        # Crear fichero .txt
+        # Escribe la cabecera. Pandas utiliza el index standard de tipo datenum y solo
+        # crea una columna y no dos como se usa normalmente con estos ficheros, por lo
+        # que se escribe antes manualmente
+        formato_fecha = '%Y_%m_%d'
+        nombre_fichero_texto = path_fichero + nombre_fichero + \
+            dia.strftime(formato_fecha) + '.txt'
+        
+        with open(nombre_fichero_texto, 'w', newline='') as f:
+            a = csv.writer(f, delimiter='\t')
+            a.writerow(data.columns)
+        
+        # Escribe los datos seleccionados en cols en modo append sin cabecera ni index
+        data.to_csv(nombre_fichero_texto, columns=data.columns, mode='a', sep='\t',
+                    float_format='%.3f', header=False, index=False, na_rep='NaN')
+        
+        print('Ha escrito fichero ' + nombre_fichero_texto)
+        
+        # %% Grafica
+        '''
+        plt.figure(figsize=(8, 6))
+        plt.title('DNI+isotpyes - ' + nombre_fichero +
+                  dia.strftime(formato_fecha))
+        plt.grid(which='minor')
+        plt.ylabel('Irradiance $\mathregular{[W·m^{-2}]}$')
+        data.Top.plot(legend=True)
+        data.Mid.plot(legend=True)
+        data.Bot.plot(legend=True)
+        data.Rad_Dir.plot(legend=True)
+        plt.ylim([0, 1100])
+        
+        nombre_fichero_imagen = path_fichero + 'img/' + \
+            nombre_fichero + dia.strftime(formato_fecha) + '.png'
+        plt.savefig(nombre_fichero_imagen)
+        
+        print('Ha escrito fichero ' + nombre_fichero_imagen)
+        '''
     
     return True
