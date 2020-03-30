@@ -455,9 +455,17 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         print("Error en la recepción.\n")
         return -1
     
-    #Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
     canales = bbdd.get_channels_config(num_estacion)['Abreviatura'].tolist()
-    res = dict(zip(canales,medidas))
+    
+    #Se crea un lista con las unidades de las variables
+    unidades = []
+    for medida in canales:
+        param = bbdd.get_parameters().set_index('Abreviatura')['Unidad']
+        unidades.append(param.loc[medida])
+    
+    #Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
+    med =[list(x) for x in zip(medidas,unidades)]
+    res = dict(zip(canales, med))
     
     #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas
     return fecha, res
