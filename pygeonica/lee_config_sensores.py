@@ -26,7 +26,7 @@ class lee_config:
             print("Error en la lectura del fichero")
         
 
-#%%
+#%% Lectura del fichero de configuración
 
 config = lee_config()
 

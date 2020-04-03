@@ -17,6 +17,12 @@ from pathlib import Path
 
 module_path = os.path.dirname(__file__)
 
+# %%
+###########################################################################################################
+####
+####        EXTRACCIÓN DE VARIABLES GLOBALES DEL FICHERO DE CONFIGURACIÓN
+####
+###########################################################################################################
 try: 
     with open(str(Path(module_path, 'bbdd_config.yaml')),'r') as config_file:
         config = yaml.load(config_file, Loader = yaml.FullLoader) #Se utiliza el FullLoader para evitar un mensaje de advertencia, ver https://msg.pyyaml.org/load para mas información
@@ -29,12 +35,13 @@ try:
 except yaml.YAMLError:
     print ("Error in configuration file")
 
-SERVER_ADDRESS = servidor['IP']  # IP PC Ruben: '138.4.46.139'      IP PC Martin: '138.4.46.164'      IP PC Server: '138.4.46.69'
+# Variables globales del módulo
+SERVER_ADDRESS = servidor['IP']  
 PORT = str(servidor['Puerto'])              
 DDBB_name = bbdd['Database']
-database = bbdd['Nombre']    #Nombre por defecto que se le asigna a la base de datos
-username = bbdd['Usuario']            #Usuario por defecto
-password = bbdd['Contrasena']            #Contraseña por defecto
+database = bbdd['Nombre']
+username = bbdd['Usuario']
+password = bbdd['Contrasena']
 
 DEFAULT_NAME = file['Nombre']
 DEFAULT_PATH = file['Path']
@@ -48,7 +55,32 @@ DEFAULT_PATH = file['Path']
 # Instalar driver (si no está ya al instalar GEONICA SUITE 4K)
 # https://www.microsoft.com/en-us/download/details.aspx?id=36434
 
-def _request_ddbb(server_address = SERVER_ADDRESS):                                            #request común a todas las funciones
+#%%
+###########################################################################################################
+####
+####        FUNCIONES INTERNAS DEL MÓDULO BBDD
+####
+###########################################################################################################
+
+def _request_ddbb(server_address = SERVER_ADDRESS):       #request común a todas las funciones                                         
+    """
+    Info
+    ----------
+    Funcion encargada de generar el string correspondiente al
+    request que es necesario cada vez que se incia a comunicacion con la base de datos.
+    
+    Parameters
+    ----------
+    server_address : str, opcional
+        Formato: 255.255.255.255
+        El valor por defecto es la IP del servidor Meteo.
+
+    Returns
+    -------
+    str
+
+    """
+   
     request = (                                                         
             'DRIVER={ODBC Driver 11 for SQL Server};'                   ##Se seleccion el driver a utilizar
             # la ; hace que falle si hay más campos
@@ -59,13 +91,37 @@ def _request_ddbb(server_address = SERVER_ADDRESS):                             
     )
     return request;
 
+#%%
+###########################################################################################################
+####
+####        INTERFAZ DE USUARIO
+####
+###########################################################################################################
 
 def get_data_raw(numero_estacion, fecha_ini, fecha_fin = dt.date.today().strftime('%Y-%m-%d %H:%M')):
-    '''
+    """
+    Info
+    ----------
     Se obtienen los datos en bruto de una estacion deseada, 
         estos datos incluyen todos las funciones que estén configuradas en la estación.
 
-    '''
+    Parameters
+    ----------
+    numero_estacion : int
+        El número identificativo de la estación.
+    fecha_ini : str de datatime.date
+        La fecha de incio del periodo deseado.
+    fecha_fin : str de datatime.date, opcional
+        Fecha final del periodo. Por defecto es la fecha de hoy.
+
+    Returns
+    -------
+    data_raw : pandas.DataFrame
+        DataFrame con todos los datos de la base de datos en el periodo
+        deseado.
+
+    """
+
     request = _request_ddbb()
     
     query_data = (
@@ -75,17 +131,26 @@ def get_data_raw(numero_estacion, fecha_ini, fecha_fin = dt.date.today().strftim
             "Fecha < '" + fecha_fin + "'"
     ) #Se solicitan las medidas, junto son su correspondiende NumParámetro, de un periodo determinado
     
-    data_raw = pd.read_sql(query_data, pyodbc.connect(request))#Se construye el DataFrame con los valores pedidos a la base de datos
+    #Se construye el DataFrame con los valores pedidos a la base de datos
+    data_raw = pd.read_sql(query_data, pyodbc.connect(request))
     
     return data_raw
 
 
 def get_parameters():
-    '''
+    """
+    Info
+    -------
     Mediante esta función se obtienen las funciones que están disponibles en la estacion,
-        junto con su número de parametro y unidad.
+    junto con su número de parametro y unidad.    
+    
+    Returns
+    -------
+    data_parameters : pandas.DateFrame
+        DataFrame formada por: NumParametro, Nombre, Abreviatura y Unidad
 
-    '''
+    """
+    
     request = _request_ddbb()
     
     query_parameters = (
@@ -101,11 +166,25 @@ def get_parameters():
     
 
 def get_channels_config(numero_estacion):
-    '''
+    """
+    Info
+    ----------
     Devuelve una lista de los canales configurasdos en la estación indicada,
-    estos canales estan ordenados en el mismo orden en el que los deveulve la estación
+    estos canales están ordenados en el mismo orden en el que los devuelve la estación
     cuando se le solicita (mediante puerto Serie, conexión IP, etc. ) los datos de los canales.
-    '''
+
+    Parameters
+    ----------
+    numero_estacion : int
+        El número identificativo de la estación.
+
+    Returns
+    -------
+    canales : pandas.DataFrame
+        DataFrame con los canales configrados, formato: NumFuncion, Abreviatura y NumParametro
+
+    """
+
     request = _request_ddbb()
     
     query_channels_config = (
@@ -119,16 +198,26 @@ def get_channels_config(numero_estacion):
     data_channels_config = (
             pd.read_sql(query_channels_config, pyodbc.connect(request))
      )
-    
+    # Se ordenan los canales por el número del 'Canal' que le corresponde en a base de datos
     data_channels_config.set_index('Canal', inplace = True)
     data_channels_config.sort_values(by = 'Canal', inplace= True)
+    # Se borran los duplicados en la columna de 'Abreviatura', y se quita la columna 'Canal' que no aporta información
+    # útil, ya que son valores propios de la base de datos.
     canales = data_channels_config.drop_duplicates(subset='Abreviatura').reset_index().drop(columns='Canal')
     return canales
 
 def get_functions():
-    '''
+    """
+    Info
+    -------
     Devuelve una lista con el número correspondiente a la función.
-    '''
+
+    Returns
+    -------
+    funciones : pandas.DateFrame
+        DataFrame con NumFuncion y Nombre (de la función)
+
+    """
     
     request = _request_ddbb()
     
@@ -141,19 +230,35 @@ def get_functions():
             pd.read_sql(query_functions, pyodbc.connect(request))
     )
     
+    # Se establece 'NumFuncion' como índice
     funciones.set_index('NumFuncion', inplace = True)
     return funciones
 
 
 def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
-    #    INPUT:    dia (datetime.date)
-    #            lista_campos (lista con campos a obtener de la BBDD)
-    #    OUTPUT:    datos (pandas.DataFrame)
-    #    CONFIG:    numero_estacion
-    #            path_mdb, fichero_mdb
-    #            driver
+    """
+    Info
+    ----------
+    Se devuelven los datos de un día que se encuentran en la estación.
 
-    #Si el usuario no especifica ninguna lista de campos deseados, por defecto de le devuelven todos los canales
+    Parameters
+    ----------
+    dia : datetime.date
+        Día del que se quieren extraer los datos.
+    numero_estacion : int
+        Número identificativo de la estación.
+    lista_campos : TYPE, optional
+        lista con campos a obtener de la BBDD. 
+        Por defecto son todos los canales configurados en la estación.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame con todos los datos de la estación, con la fecha y hora como índice.
+
+    """
+
+    #Si el usuario no especifica ninguna lista de campos deseados, por defecto se devuelven todos los canales
     # disponibles de la estación
     if lista_campos == None:
         lista_campos = ['yyyy/mm/dd hh:mm']
@@ -215,7 +320,6 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
         data.iloc[-1] = data.iloc[-2] + (data.diff().mean())
 
         # Cambia codigo NumParametro de BBDD a su nombre de fichero
-        
         data_channels = get_parameters().set_index('NumParametro') #Se obtienen los números de los parámetros...
         data.rename(columns = data_channels['Abreviatura'], inplace=True) #... y se sustituye el NumParametro por el Nombre
         
@@ -255,16 +359,21 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
 
 
 def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_fichero=DEFAULT_PATH):
-    '''
+    """
+    Info
+    ----------
+    Genera un fichero .txt por cada día del periodo solicitado.
     
     Parameters
     ----------
     dia_inicial : str(AAAA-MM-DD) o datetime-like
-    dia_final : str(AAAA-MM-DD) o datetime-like, optional
-        Por defecto es el día antetior.
-    nombre_fichero : string, optional
-        Por defecto es: meteoAAAA_MM_DD
-    path : string, optional
+    dia_final : str(AAAA-MM-DD) o datetime-like, opcional
+        Por defecto es el día antetior a la ejecución del código.
+    nombre_fichero : string, opcional
+        Por defecto es: meteo. Al nombre del fichero se añade la fecha del mismo.
+        Con lo que, por defecto, se generará un fichero: meteoAAAA_MM_DD.txt
+    path : string, opcional
+        Formato adecuado: 'C:/mi_usuario/mis_documentos/mi_carpeta/'
         Rellenar en el caso de que el usuario
         del script no sea el servidor.
 
@@ -274,7 +383,7 @@ def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_
         True: Fichero creado correctamente
         False: Error en la función
 
-    '''
+    """
     
     #Si no se indica fecha del final del peridod deseado,
     #se reciben los datos hasta el día anterior
@@ -286,7 +395,7 @@ def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_
         nombre_fichero = DEFAULT_NAME
     
     
-    # %% Generación fichero llamando a función lee_dia_geonica_ddbb(dia, lista_campos)
+    # Generación fichero llamando a función lee_dia_geonica_ddbb(dia, lista_campos)
     
     # Se llama tantas veces a la funcion lee_dia_geonica_ddbb() como días haya en el perido indicado
     for d in pd.date_range(start=dia_inicial, end=dia_final):
@@ -321,7 +430,7 @@ def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_
         
         print('Ha escrito fichero ' + nombre_fichero_texto)
         
-        # %% Grafica
+        # Grafica
         '''
         plt.figure(figsize=(8, 6))
         plt.title('DNI+isotpyes - ' + nombre_fichero +

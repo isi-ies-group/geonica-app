@@ -5,10 +5,10 @@
 ##################################################################
 
 Servidor:
-    IP: 138.4.46.69
-    Puerto: 49172
+    IP: 138.4.46.69     # IP PC Ruben: '138.4.46.139'      IP PC Server: '138.4.46.69'
+    Puerto: 49172       # Puerto por defecto del Servidor SQL que genera Geonica
     
-BBDD:
+BBDD:   # Valores por defecto de la base de datos Geonica
     Nombre: MeteoStation4k    
     Usuario: Geonica
     Contrasena: g30n1c4

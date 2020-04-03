@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 from . import bbdd
 
-
+# %%
 ###########################################################################################################
 ####
 ####        EXTRACCIÓN DE VARIABLES GLOBALES DEL FICHERO DE CONFIGURACIÓN
@@ -33,7 +33,7 @@ try:
 except yaml.YAMLError:
     print ("Error in configuration file.\n")
     
-#Asignacion de valores a variables globales
+# Variables globales del módulo
 Estaciones = {}
 for estacion in config['Estaciones']:
     Estaciones.update({estacion['Num'] : estacion['IP']})
@@ -45,6 +45,7 @@ PORT = config['PORT']
 TIEMPO_RTS_ACTIVO = config['TIEMPO_RTS_ACTIVO'] 
 TIEMPO_ESPERA_DATOS = config['TIEMPO_ESPERA_DATOS']
 
+#%%
 ###########################################################################################################
 ####
 ####        FUNCIONES INTERNAS DEL PROTOCOLO GEONICA
@@ -53,6 +54,23 @@ TIEMPO_ESPERA_DATOS = config['TIEMPO_ESPERA_DATOS']
 
 
 def _cabecera(numero_estacion):  #La cabecera de todos los mensajes recibidos por el sistema de medición
+    """
+    Info
+    ---------
+    Función que genera la cabecera de las tramas recibidas por geonica.
+    Útil a la hora de comprobar la correcta recepción de la trama.
+
+    Parameters
+    ----------
+    numero_estacion : int
+        El número identificativo de la estación.
+
+    Returns
+    -------
+    CABECERA : bytes
+
+    """
+    
     DLE = bytes(chr(16), encoding='ascii')                  #Data Link Escape
     SYN = bytes(chr(22), encoding='ascii')                  #Syncronos Idle
     SOH = bytes(chr(1), encoding='ascii')                   #Start of Heading
@@ -64,10 +82,28 @@ def _cabecera(numero_estacion):  #La cabecera de todos los mensajes recibidos po
     return CABECERA
 
 
-def _comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano( o un entero) indicando si se ha producido algun error:
-                                                                              # True: Recepcion correcta
-                                                                              # False: Recepcion de bytes incorrecta
-                                                                              # Entero: Indica el codigo del error producido (Mirar página 9 del Protocolo de comunicaciones de Geonica Meteodata 3000)
+def _comprobar_recepcion(trama_bytes, numero_estacion): 
+    """
+    Info
+    ----------
+    Se comprueba la trama recibida. Devolviendo un booleano o el código del error. 
+    
+    Parameters
+    ----------
+    trama_bytes : bytes
+        Trama recibida por la estación.
+    numero_estacion : int
+        El número identificativo de la estación.
+
+    Returns
+    -------
+         True: Recepcion correcta
+         False: Recepcion de bytes incorrecta
+         Int: Indica el codigo del error producido (Mirar página 9 del Protocolo de comunicaciones de Geonica Meteodata 3000)
+   
+
+    """
+    
     trama = bytearray(trama_bytes)
     bytes_recibidos = len(trama)
     estado = bool()
@@ -88,11 +124,28 @@ def _comprobar_recepcion(trama_bytes, numero_estacion): #Se obtiene un booleano(
 
 
 def _visulizar_trama(trama_bytes):
-    '''
+    """
+    Info
+    ----------
+    FUNCION INTERNA PARA PERMITIR VISULIZAR LA TRAMA.
+    NO ES UNA FUNCÍON QUE SE UTILICE EN EL MÓDULO, SIMPLEMENTE
+    SE HA PROGRAMADO PARA LA REALIZACIÓN DE PRUEBAS PRUEBAS.
+    
     Este método decodifica la trama recibida de la estación, el caso expuesto a continución se produce cuando se
     solicitan los valores intanstáneos de la estación. En el caso de que se soliciten otro tipo de valores, 
     los bytes del 117(trama_bytes[116]) al 188(trama_bytes[187]) no contienen ninguna información relevante.
-    '''
+    
+    Parameters
+    ----------
+    trama_bytes : bytes
+        Trama recibida por la estación.
+
+    Returns
+    -------
+    trama : list
+        Lista de números con los bytes recibidos por la estación.
+
+    """
     
     trama = []
     #CABECERA
@@ -135,6 +188,36 @@ def _visulizar_trama(trama_bytes):
 
 
 def _genera_trama(numero_estacion, comando):
+    """
+    Info
+    ----------
+    Genera la trama que se vaa enviar a la estación.
+
+    Parameters
+    ----------
+    numero_estacion : int
+        El número identificativo de la estación.
+    comando : int
+        Indica el tipo de medidas que se quieren leer:
+            1 (Medidas instantáneas)
+            12 (Valores tendentes)
+            13 (Medidas almacenadas en última posición)
+            14 (Medio)
+            15 (Acumulado)
+            16 (Integrado)
+            17 (Máximo)
+            18 (Mínimo)
+            19 (Desviación estándar)
+            20 (Incremento)
+            21 (Estado alarma)
+            22 (Operación OR de todos los valores)
+
+    Returns
+    -------
+    trama : bytes
+        Trama a enviar.
+    """
+    
     DLE = bytes(chr(16), encoding='ascii')
     SYN = bytes(chr(22), encoding='ascii')
     E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
@@ -151,6 +234,24 @@ def _genera_trama(numero_estacion, comando):
     
     
 def _genera_trama_sincronizar(numero_estacion, hora):
+    """
+    Info
+    ----------
+    Genera la trama para sincronizar la hora de la estación.
+
+    Parameters
+    ----------
+    numero_estacion : int
+        El número identificativo de la estación.
+    hora : datetime.datetime
+        Fecha y hora que se quiere enviar a la estación
+
+    Returns
+    -------
+    trama : bytes
+        Trama a enviar.
+    """
+    
     DLE = bytes(chr(16), encoding='ascii')
     SYN = bytes(chr(22), encoding='ascii')
     E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
@@ -174,6 +275,22 @@ def _genera_trama_sincronizar(numero_estacion, hora):
 
 
 def _decodificar_medidas(trama_bytes):
+    """
+    Info
+    ----------
+    Decodifica la trama recibida por la estación, y devuelve las medidas en floats.
+
+    Parameters
+    ----------
+    trama_bytes : bytes
+        Trama recibida por la estación.
+
+    Returns
+    -------
+    valor : list de floats
+        Medidas de los canales.
+    """
+    
     trama = bytearray(trama_bytes)
     medidas = []
     canales_configurados = trama_bytes[11]                    #Bytes indicando el numero de canales configurados
@@ -192,6 +309,22 @@ def _decodificar_medidas(trama_bytes):
 
 
 def _decodificar_FechayHora(trama_bytes):
+    """
+    Info
+    ----------
+    Se encarga de docdificar la trama recibida y de obtener la fecha y hora de la estación.
+
+    Parameters
+    ----------
+    trama_bytes : bytes
+        Trama recibida por la estación.
+
+    Returns
+    -------
+    date : datetime.datetime
+        Fecha y hora de la estación.
+
+    """
     #class datetime.datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0)  #Constructor de la clase datetime
     date = dt.datetime(trama_bytes[12] + 2000, trama_bytes[13], trama_bytes[14], trama_bytes[15], trama_bytes[16], trama_bytes[17])
     
@@ -209,8 +342,7 @@ def _decodificar_FechayHora(trama_bytes):
     
     return date
 
-
-
+#%%
 ###########################################################################################################
 ####
 ####        FUNCIONES INTERNAS DE COMUNICACIÓN
@@ -219,7 +351,11 @@ def _decodificar_FechayHora(trama_bytes):
 
 
 def _socket(dir_socket, trama, num_bytes):
-    '''
+    """
+    Info
+    ----------
+    Esta función se encarga de abrir y configurar el socket, establecer la conexión con la estación, 
+    enviar la trama deseada y recibir la respuesta de la estación.
 
     Parameters
     ----------
@@ -233,7 +369,7 @@ def _socket(dir_socket, trama, num_bytes):
     lectura : bytearray
         La lectura de la estación en bruto
 
-    '''
+    """
     
     #Se crear el scoket y se conceta con la estación
     try:
@@ -268,7 +404,8 @@ def _socket(dir_socket, trama, num_bytes):
 
 
 def _serial(dir_serial, trama):
-    '''
+    """
+    De forma similar a _socket(), pero mediante el puerto de comunicación Serie.
 
     Parameters
     ----------
@@ -281,7 +418,7 @@ def _serial(dir_serial, trama):
     lectura : bytearray
         La lectura de la estación en bruto
 
-    '''
+    """
     #Se confiura y abre el puerto serie
     try:
         ser = serial.Serial(
@@ -313,7 +450,7 @@ def _serial(dir_serial, trama):
     return lectura
 
 
-
+#%%
 ###########################################################################################################
 ####
 ####        INTERFAZ DE USUARIO
@@ -322,19 +459,21 @@ def _serial(dir_serial, trama):
 
 
 def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
-    '''
+    """
+    Info
+    ----------
+    Como su nombre indica, lee los canales de una estación.
 
     Parameters
     ----------
-    num_estacion : int, opcional
-        Por defecto es NUMERO_ESTACION.
+    num_estacion : int
     modo_comm : str, opcional
         Por defecto es 'socket'.
     dir_socket : str, opcional
-        Por defecto es None.
+        Por defecto es None. Se obtiene del fichero de configuración.
     dir_serie : str, opcional
         Por defecto es None.
-    modo : int, optional
+    modo : int, opcional
         Indica el tipo de medidas que se quieren leer:
             12 (Valores tendentes)
             13 (Instantáneo)
@@ -352,9 +491,12 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
     Returns
     -------
     fecha : datetime
-	medidas : list (float)
+	medidas : dict (str : (float + str))
+        Se devuelve un diccionario con los nombres de los canales como key(clave) y 
+        que contiene una lista con los valores de las medidas obtenidas, 
+        junto con correspondietes unidades.
 
-    '''
+    """
     
     #Se define la trama que se va a enviar, en función de la información deseada
     if (modo == 1) | ((modo >= 12) & (modo <= 22)):
@@ -467,31 +609,34 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
     med =[list(x) for x in zip(medidas,unidades)]
     res = dict(zip(canales, med))
     
-    #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas
+    #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas, junto con sus unidades
     return fecha, res
 
 
 def sincroniza_hora(num_estacion, hora, modo_comm='socket', dir_socket=None, dir_serie=None):
-    '''
+    """
+    Info
+    ----------
+    Función encargada de la sincronización de la fecha/hora de la estación.
 
     Parameters
     ----------
-    num_estacion : str, opcional 
-        Por defecto es NUMERO_ESTACION.
+    num_estacion : str
+    hora : dt.datetime
     modo_comm : str, opcional
         Por defecto es 'socket'.
     dir_socket : str, opcional
-        Por defecto es None.
+        Por defecto es None. Se obtiene del fichero de configuración.
     dir_serie : str, opcional
         Por defecto es None.
-    hora : dt.datetime
+        
     Returns
     -------
-    esatdo_recepcion
+    esatdo_recepcion:
         Devuelve True si se ha sincronizado la hora o
         el número del error recibido.
 
-    '''
+    """
     
     #Se define la trama que se va a enviar, en función de la información deseada
     trama = _genera_trama_sincronizar(num_estacion, hora)
@@ -567,8 +712,3 @@ def sincroniza_hora(num_estacion, hora, modo_comm='socket', dir_socket=None, dir
         print("Error en la comunicacion con la estación.\n")
         print(estado_recepcion)
         return False
-    
-    
-    
-    
-    
