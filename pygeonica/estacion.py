@@ -10,9 +10,10 @@ import socket
 import time
 import datetime as dt
 import struct
-from bbdd import PATH_CONFIG_PYGEONICA
-from bbdd import lee_config
 from . import bbdd
+from .bbdd import PATH_CONFIG_PYGEONICA
+from .bbdd import lee_config
+
 
 # %%
 ###########################################################################################################

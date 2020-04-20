@@ -524,7 +524,7 @@ def comprueba_canales_fichero_config():
             
         # Se obtienen los canles configurados por cada estación 
         for estacion in estaciones:
-            info_canales = bbdd.get_channels_config(estacion)['Abreviatura'].tolist()
+            info_canales = get_channels_config(estacion)['Abreviatura'].tolist()
             canales[estacion] = info_canales
         
         return canales
