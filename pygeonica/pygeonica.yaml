@@ -1,6 +1,6 @@
 ##################################################################
 ## 
-##      Configuración del módulo de lectura de base de datos   
+##      Configuración del módulo pygeonica  
 ##      
 ##################################################################
 
@@ -14,11 +14,29 @@ BBDD:   # Valores por defecto de la base de datos Geonica
     Contrasena: g30n1c4
     Database: GEONICASUITE4  K
 
-File:
+Estacion: # Configuración necesaria parae estacion.py del módulo
+    BYTEORDER : big
+    PASS : "geonica "
+    NUMERO_USUARIO : 1
+    PORT : 30000
+    TIEMPO_RTS_ACTIVO : 0.1
+    TIEMPO_ESPERA_DATOS : 0.5   # Timepo de espera entre el envío de una trama y la escucha de la respuesta de la estación. Tener CUIDADO, valores bajos pueden imposibilitar la conexión.
+    Estaciones:
+        -
+            Num: 316
+            IP: 138.4.46.34
+        -
+            Num: 2169
+            IP: 138.4.46.2
+        -
+            Num: 2171
+            IP: 138.4.46.83
+
+File: # Configuración sobre el fichero generado con la info de los sensores
     Nombre: meteo
     Path: "D:/datos/Datos Meteo IES/"
     
-Dict_Rename:
+Dict_Rename: # Diccionario con los nombres de las variables que se desean modificar. Nombre en la estacion: Nombre que se desea que tenga la variable en el fichero generado
     "Estado" : Limpieza
     "PIRAN.1" : Gh                  # Global Horizontal
     "PIRAN.2" : Dh                  # Difusa Horizontal

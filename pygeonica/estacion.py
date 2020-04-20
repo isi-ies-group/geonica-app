@@ -10,10 +10,8 @@ import socket
 import time
 import datetime as dt
 import struct
-import pandas as pd
-import yaml
-import os
-from pathlib import Path
+from bbdd import PATH_CONFIG_PYGEONICA
+from bbdd import lee_config
 from . import bbdd
 
 # %%
@@ -23,8 +21,7 @@ from . import bbdd
 ####
 ###########################################################################################################
 
-module_path = os.path.dirname(__file__)
-
+'''
 try: 
     with open(str(Path(module_path, 'estacion_config.yaml')),'r') as config_file:
         config = yaml.load(config_file, Loader = yaml.FullLoader) #Se utiliza el FullLoader para evitar un mensaje de advertencia, ver https://msg.pyyaml.org/load para mas información
@@ -32,7 +29,10 @@ try:
 
 except yaml.YAMLError:
     print ("Error in configuration file.\n")
-    
+'''    
+
+config = lee_config('Estacion', PATH_CONFIG_PYGEONICA)
+
 # Variables globales del módulo
 Estaciones = {}
 for estacion in config['Estaciones']:
@@ -42,7 +42,7 @@ BYTEORDER = config['BYTEORDER']
 PASS = config['PASS']
 NUMERO_USUARIO = config['NUMERO_USUARIO']
 PORT = config['PORT']
-TIEMPO_RTS_ACTIVO = config['TIEMPO_RTS_ACTIVO'] 
+TIEMPO_RTS_ACTIVO = config['TIEMPO_RTS_ACTIVO']
 TIEMPO_ESPERA_DATOS = config['TIEMPO_ESPERA_DATOS']
 
 #%%

@@ -7,31 +7,6 @@
 ##
 ######################
 
-Servidor:
-    IP: 138.4.46.69
-    Puerto: 49172  
-    Nombre: MeteoStation4k    
-    Usuario: Geonica
-    Contrasena: g30n1c4
-    
-BBDD:
-    Nombre: MeteoStation4k    
-    Usuario: Geonica
-    Contrasena: g30n1c4
-    Database: GEONICASUITE4  K
-
-Estaciones:
-    -
-        Numero: 316
-        IP: 138.4.46.34
-        Canales: 17
-        Nombre: IES-ISI1
-    -
-        Numero: 2169
-        IP: 138.4.46.2
-        Canales: 17
-        Nombre: IES-ISI2
-
 Sensores:
     -
         Info:
