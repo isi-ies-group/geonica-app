@@ -8,10 +8,11 @@ Created on Mon Mar 16 09:12:36 2020
 import serial
 import socket
 import time
+import os
 import datetime as dt
 import struct
+
 from . import bbdd
-from .bbdd import PATH_CONFIG_PYGEONICA
 from .bbdd import lee_config
 
 
@@ -31,6 +32,8 @@ try:
 except yaml.YAMLError:
     print ("Error in configuration file.\n")
 '''    
+module_path = os.path.dirname(__file__)
+PATH_CONFIG_PYGEONICA = str(Path(module_path, 'pygeonica_config.yaml'))
 
 config = lee_config('Estacion', PATH_CONFIG_PYGEONICA)
 

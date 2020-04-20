@@ -16,7 +16,7 @@ from pathlib import Path
 # https://docs.microsoft.com/es-es/sql/relational-databases/lesson-2-connecting-from-another-computer?view=sql-server-ver15
 
 module_path = os.path.dirname(__file__)
-PATH_CONFIG_PYGEONICA = str(Path(module_path, 'pygeonica.yaml'))
+PATH_CONFIG_PYGEONICA = str(Path(module_path, 'pygeonica_config.yaml'))
 PATH_CONFIG_SENSORES = str(Path(module_path, 'sensores_config.yaml'))
 
 # %%
