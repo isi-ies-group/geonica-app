@@ -440,11 +440,20 @@ def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_
     for d in pd.date_range(start=dia_inicial, end=dia_final):
         dia = d.date()
         
-        # Lee BBDD y obtiene datos del dia
-        data_316 = lee_dia_geonica_ddbb(dia, 316)
-        data_2169 = lee_dia_geonica_ddbb(dia, 2169)
-        #Para que no se produzcan errorres, se asigna el sufijo "_2" a los parámetros de la estacion 2169 que se repetan en ambas estaciones.
-        data = data_316.join(data_2169, rsuffix='_2')
+        # Listas con las estacinones en funcionamiento
+        estaciones = lee_config('Estaciones Operativas', PATH_CONFIG_PYGEONICA)
+        
+        i = 1 # Variable auxiliar
+        data = pd.DataFrame()
+        # Lee BBDD y obtiene datos del dia por cada estación, y se añaden al DataFrame completo
+        for estacion in estaciones:
+            if i == 1:
+                data = lee_dia_geonica_ddbb(dia, estacion)
+            else:
+                data_estacion = lee_dia_geonica_ddbb(dia, estacion)
+                #Para que no se produzcan errorres, se asigna el sufijo "_i"(>=2) a los parámetros que coinciden en alguna estación
+                data = data.join(data_estacion, rsuffix=('_' + str(i)))
+            i += 1
             
         #Como la fecha y la hora son columnas compartidas, e idénticas, se elimina los duplicados y canales innecesarios.
         data.drop(columns={'yyyy/mm/dd hh:mm_2', 'VRef Ext.', 'Bateria', 'Bateria_2', 'Est.Geo3K', 'Est.Geo3K_2'}, inplace=True)
@@ -520,7 +529,9 @@ def comprueba_canales_fichero_config():
         '''
         
         canales = {}
-        estaciones = [316, 2169]
+        
+        # Se obtienen las estaciones operativas
+        estaciones = lee_config('Estaciones Operativas', PATH_CONFIG_PYGEONICA)
             
         # Se obtienen los canles configurados por cada estación 
         for estacion in estaciones:
@@ -549,7 +560,7 @@ def comprueba_canales_fichero_config():
         
         # Se inicializa el diccionario que contendrá la información de los sensores concetados 
         # a cada estación
-        info = {316:{}, 2169:{}}
+        info = {i:{} for i in lee_config('Estaciones Operativas', PATH_CONFIG_PYGEONICA)}
         
         # Se recorre la lista de los sensores
         for sensor in lista_sensores:
