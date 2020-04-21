@@ -11,6 +11,7 @@ import time
 import os
 import datetime as dt
 import struct
+from pathlib import Path
 
 from . import bbdd
 from .bbdd import lee_config
