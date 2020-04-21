@@ -54,20 +54,6 @@ def lee_config(dato, path):
         print ("Error en el fichero de configuración")
     except:
         print("Error en la lectura del fichero")
-
-'''
-try: 
-    with open(str(Path(module_path, 'bbdd_config.yaml')),'r') as config_file:
-        config = yaml.load(config_file, Loader = yaml.FullLoader) #Se utiliza el FullLoader para evitar un mensaje de advertencia, ver https://msg.pyyaml.org/load para mas información
-        servidor = config['Servidor']                             #No se utiliza el BasicLoader debido a que interpreta todo como strings, con FullLoader los valores numéricos los intrepreta como int o float
-        bbdd = config['BBDD']
-        file = config['File']
-        dict_renombrar = config['Dict_Rename']
-        del config                       
-
-except yaml.YAMLError:
-    print ("Error in configuration file")
-    '''
     
 servidor = lee_config('Servidor', PATH_CONFIG_PYGEONICA)
 bbdd = lee_config('BBDD', PATH_CONFIG_PYGEONICA)
@@ -286,7 +272,7 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
         Día del que se quieren extraer los datos.
     numero_estacion : int
         Número identificativo de la estación.
-    lista_campos : TYPE, optional
+    lista_campos : list, optional
         lista con campos a obtener de la BBDD. 
         Por defecto son todos los canales configurados en la estación.
 
@@ -299,10 +285,12 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
 
     #Si el usuario no especifica ninguna lista de campos deseados, por defecto se devuelven todos los canales
     # disponibles de la estación
+    formato_fecha = 'yyyy/mm/dd hh:mm'
     if lista_campos == None:
-        lista_campos = ['yyyy/mm/dd hh:mm']
-        canales = get_channels_config(numero_estacion)['Abreviatura'].tolist()
-        lista_campos += canales
+        lista_campos = get_channels_config(numero_estacion)['Abreviatura'].tolist()
+    # Se añade la fecha como columna, en el caso de que no esté incluida ya
+    if not formato_fecha in lista_campos:
+        lista_campos.insert(0, formato_fecha)
     
     dia_datetime = dt.datetime.combine(dia, dt.datetime.min.time())
     formato_tiempo = '%Y-%m-%d %H:%M'
@@ -382,11 +370,15 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
 
     # En caso de que el columns esté incompleto, se reindexa para que añada nuevos con valores NaN
 
-    lista_campos_corta = lista_campos.copy()
-    lista_campos_corta.remove('yyyy/mm/dd hh:mm')
+    # lista_campos_corta = lista_campos.copy()
+    # lista_campos_corta.remove('yyyy/mm/dd hh:mm')
     # lista_campos_corta.remove('yyyy/mm/dd')
-    if set(lista_campos_corta).issuperset(data.columns):
+    # if set(lista_campos_corta).issuperset(data.columns):
+    #     data = data.reindex(columns=lista_campos)
+    if lista_campos != data.columns.tolist():
         data = data.reindex(columns=lista_campos)
+    
+            
     
     # # Separa y crea en 2 columnas fecha y hora
     # # tambien valdría data.index.strftime('%Y/%m/%d')
@@ -445,18 +437,30 @@ def genera_fichero_meteo(dia_inicial, dia_final=None, nombre_fichero=None, path_
         
         i = 1 # Variable auxiliar
         data = pd.DataFrame()
+        # Se obtiene las variabes que no se quieren incluir en el fichero generado
+        vars_excluidas = lee_config('Vars_Excluidas', PATH_CONFIG_PYGEONICA)
+        fecha = 'yyyy/mm/dd hh:mm'
         # Lee BBDD y obtiene datos del dia por cada estación, y se añaden al DataFrame completo
         for estacion in estaciones:
             if i == 1:
                 data = lee_dia_geonica_ddbb(dia, estacion)
+                # Se eliminan las medidas que no se quieren almacenar
+                for var in vars_excluidas:
+                    if var in data.columns:
+                        data.drop(columns=var, inplace=True)
             else:
                 data_estacion = lee_dia_geonica_ddbb(dia, estacion)
+                # Se eliminan las medidas que no se quieren almacenar, junto con la fecha, debido a que está se repite en cada estación
+                data_estacion.drop(columns = fecha, inplace=True)
+                for var in vars_excluidas:
+                    if var in data_estacion.columns:
+                        data_estacion.drop(columns=var, inplace=True)
                 #Para que no se produzcan errorres, se asigna el sufijo "_i"(>=2) a los parámetros que coinciden en alguna estación
                 data = data.join(data_estacion, rsuffix=('_' + str(i)))
             i += 1
             
         #Como la fecha y la hora son columnas compartidas, e idénticas, se elimina los duplicados y canales innecesarios.
-        data.drop(columns={'yyyy/mm/dd hh:mm_2', 'VRef Ext.', 'Bateria', 'Bateria_2', 'Est.Geo3K', 'Est.Geo3K_2'}, inplace=True)
+        # data.drop(columns={'yyyy/mm/dd hh:mm_2', 'VRef Ext.', 'Bateria', 'Bateria_2', 'Est.Geo3K', 'Est.Geo3K_2'}, inplace=True)
         
         data.rename(columns=dict_renombrar, inplace=True)
         

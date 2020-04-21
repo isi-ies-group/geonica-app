@@ -50,3 +50,8 @@ Dict_Rename: # Diccionario con los nombres de las variables que se desean modifi
     "R.Directa2" : Bn_2             # Directa Normal 2
     "R.Infr.Inc" : Pirgeo           # Pirgeometro
     "T.Carcasa" : Temp_Pirgeo       # Temperatura Carcasa Pirgeometro
+    
+Vars_Excluidas: # Lista con las variables que se van a excluir del fihero generado
+    - VRef Ext.
+    - Bateria
+    - Est.Geo3K
