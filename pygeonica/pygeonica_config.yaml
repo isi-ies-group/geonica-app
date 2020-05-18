@@ -40,6 +40,15 @@ File: # Configuración sobre el fichero generado con la info de los sensores
     Nombre: meteo
     Path: "D:/datos/Datos Meteo IES/"
     
+Medidas_Instantaneas: # Lista con las medidas de las cuales se desea guardar los valores instantáneos
+    - "PIRAN.1"
+    - "PIRAN.2"
+    - "PIRAN.3"
+    - "PIRAN.4"
+    - "R.Directa1"
+    - "R.Directa2"
+    - "R.Infr.Inc"
+    
 Dict_Rename: # Diccionario con los nombres de las variables que se desean modificar. Nombre en la estacion: Nombre que se desea que tenga la variable en el fichero generado
     "Estado" : Limpieza
     "PIRAN.1" : Gh                  # Global Horizontal

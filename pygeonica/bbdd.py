@@ -223,12 +223,29 @@ def get_channels_config(numero_estacion):
     data_channels_config = (
             pd.read_sql(query_channels_config, pyodbc.connect(request))
      )
+    # Se modifica el NunFuncion de cada medida para obtener los valores instantáneos cuando proceda
+    medidas_instant = lee_config('Medidas_Instantaneas', PATH_CONFIG_PYGEONICA)
+    data_channels_config.set_index('Abreviatura', inplace=True)
+    # Se recorre la lista de canales...
+    for dato in data_channels_config.index:
+        # Hasta que se encuentre canal que se desee modificar...
+        if dato in medidas_instant:
+            # Si la medida deseada se ha configurado en la estación,
+            # para que se almacenen valores instantáneos...
+            if 1 in data_channels_config.loc[dato, 'NumFuncion'].tolist():
+                # Se modifica el dataframe, para que se guarden solo los valores instantáneos
+                ones = [1] * len(data_channels_config.loc[dato, 'NumFuncion'])
+                data_channels_config.loc[dato, 'NumFuncion'] = ones
+     
+    data_channels_config.reset_index(inplace=True)
+            
     # Se ordenan los canales por el número del 'Canal' que le corresponde en a base de datos
     data_channels_config.set_index('Canal', inplace = True)
     data_channels_config.sort_values(by = 'Canal', inplace= True)
     # Se borran los duplicados en la columna de 'Abreviatura', y se quita la columna 'Canal' que no aporta información
     # útil, ya que son valores propios de la base de datos.
     canales = data_channels_config.drop_duplicates(subset='Abreviatura').reset_index().drop(columns='Canal')
+    
     return canales
 
 def get_functions():
