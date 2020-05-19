@@ -40,7 +40,7 @@ File: # Configuración sobre el fichero generado con la info de los sensores
     Nombre: meteo
     Path: "D:/datos/Datos Meteo IES/"
 
-Tipo_Lectura_Canales_A_Fichero_316: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins, Promedios: Med, Acumulado: Acu, OR Lógica: Orl...
+Tipo_Lectura_Canales_316: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins, Promedios: Med, Acumulado: Acu, OR Lógica: Orl...
     "Temp. Ai 1": Med
     "R.Directa1": Med
     "PIRAN.1": Med
@@ -59,7 +59,7 @@ Tipo_Lectura_Canales_A_Fichero_316: # Previamente deben de existir en la BBDD (p
     "Orient.Sol": Ins
     "Est.Geo3K": Orl
 
-Tipo_Lectura_Canales_A_Fichero_2169: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins, Promedios: Med, Acumulado: Acu, OR Lógica: Orl...
+Tipo_Lectura_Canales_2169: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins, Promedios: Med, Acumulado: Acu, OR Lógica: Orl...
     "Temp. Ai 2": Med
     "Hum. Rel": Med
     "R.Directa2": Med
