@@ -39,48 +39,39 @@ Estacion: # Configuración necesaria parae estacion.py del módulo
 File: # Configuración sobre el fichero generado con la info de los sensores
     Nombre: meteo
     Path: "D:/datos/Datos Meteo IES/"
-    
-Medidas_Promedio: # Lista con las medidas de las cuales se desea guardar los valores instantáneos
-    - "PIRAN.1"
-    - "PIRAN.2"
-    - "PIRAN.3"
-    - "PIRAN.4"
-    - "R.Directa1"
-    - "R.Directa2"
-    - "R.Infr.Inc"
-    
-Config_Lectura_Medidas: # Medidas Instantáneas: Inst, Promedios: Med, ...
-    "Temp. Ai 1":
+
+Tipo_Lectura_Canales_A_Fichero: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins, Promedios: Med, Acumulado: Acu, OR Lógica: Orl...
+    "Temp. Ai 1": Med
     "R.Directa1": Med
     "PIRAN.1": Med
-    "PIRAN.2":
-    "Celula Top":
-    "Celula Mid":
-    "Celula Bot":
-    "Top - Cal ":
-    "Mid - Cal ":
-    "Bot - Cal ":
-    "Presion":
-    "V.Vien.1":
-    "D.Vien.1":
-    "Bateria":
-    "Elev.Sol":
-    "Orient.Sol":
-    "Est.Geo3K":
-    "Temp. Ai 2":
-    "Hum. Rel":
-    "R.Directa2":
-    "PIRAN.3":
-    "PIRAN.4":
-    "R.Infr.Inc":
-    "VRef Ext.":
-    "T.Carcasa":
-    "Auxil.01":
-    "V.Vien.2":
-    "D.Vien.2":
-    "Lluvia":
-    "Estado":
-   
+    "PIRAN.2": Med
+    "Celula Top": Med
+    "Celula Mid": Med
+    "Celula Bot": Med
+    "Top - Cal ": Med
+    "Mid - Cal ": Med
+    "Bot - Cal ": Med
+    "Presion": Med
+    "V.Vien.1": Med
+    "D.Vien.1": Med
+    "Bateria": Med
+    "Elev.Sol": Ins
+    "Orient.Sol": Ins
+    "Est.Geo3K": Orl
+    "Temp. Ai 2": Med
+    "Hum. Rel": Med
+    "R.Directa2": Med
+    "PIRAN.3": Med
+    "PIRAN.4": Med
+    "R.Infr.Inc": Med
+    "VRef Ext.": Med
+    "T.Carcasa": Med
+    "Auxil.01": Med
+    "V.Vien.2": Med
+    "D.Vien.2": Med
+    "Lluvia": Acu
+    "Estado": Orl
+
 Dict_Rename: # Diccionario con los nombres de las variables que se desean modificar. Nombre en la estacion: Nombre que se desea que tenga la variable en el fichero generado
     "Estado" : Limpieza
     "PIRAN.1" : Gh                  # Global Horizontal
