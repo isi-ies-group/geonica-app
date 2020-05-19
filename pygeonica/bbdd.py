@@ -223,17 +223,17 @@ def get_channels_config(numero_estacion):
     data_channels_config = (
             pd.read_sql(query_channels_config, pyodbc.connect(request))
      )
-    # Se modifica el NunFuncion de cada medida para obtener los valores instantáneos cuando proceda
-    medidas_instant = lee_config('Medidas_Instantaneas', PATH_CONFIG_PYGEONICA)
+    # Se modifica el NunFuncion de cada medida para obtener los valores promedios cuando proceda
+    medidas_promedio = lee_config('Medidas_Promedio', PATH_CONFIG_PYGEONICA)
     data_channels_config.set_index('Abreviatura', inplace=True)
     # Se recorre la lista de canales...
     for dato in data_channels_config.index:
         # Hasta que se encuentre canal que se desee modificar...
-        if dato in medidas_instant:
+        if dato in medidas_promedio:
             # Si la medida deseada se ha configurado en la estación,
-            # para que se almacenen valores instantáneos...
+            # para que se almacenen valores promedios...
             if 1 in data_channels_config.loc[dato, 'NumFuncion'].tolist():
-                # Se modifica el dataframe, para que se guarden solo los valores instantáneos
+                # Se modifica el dataframe, para que se guarden solo los valores promedios
                 ones = [1] * len(data_channels_config.loc[dato, 'NumFuncion'])
                 data_channels_config.loc[dato, 'NumFuncion'] = ones
      

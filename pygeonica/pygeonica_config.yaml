@@ -40,7 +40,7 @@ File: # Configuración sobre el fichero generado con la info de los sensores
     Nombre: meteo
     Path: "D:/datos/Datos Meteo IES/"
     
-Medidas_Instantaneas: # Lista con las medidas de las cuales se desea guardar los valores instantáneos
+Medidas_Promedio: # Lista con las medidas de las cuales se desea guardar los valores instantáneos
     - "PIRAN.1"
     - "PIRAN.2"
     - "PIRAN.3"
