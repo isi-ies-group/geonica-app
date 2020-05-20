@@ -40,43 +40,44 @@ File: # Configuración sobre el fichero generado con la info de los sensores
     Nombre: meteo
     Path: "D:/datos/Datos Meteo IES/"
 
-Tipo_Lectura_Canales_316: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins, Promedios: Med, Acumulado: Acu, OR Lógica: Orl...
-    "Temp. Ai 1": Med
-    "R.Directa1": Med
-    "PIRAN.1": Med
-    "PIRAN.2": Med
-    "Celula Top": Med
-    "Celula Mid": Med
-    "Celula Bot": Med
-    "Top - Cal ": Med
-    "Mid - Cal ": Med
-    "Bot - Cal ": Med
-    "Presion": Med
-    "V.Vien.1": Med
-    "D.Vien.1": Med
-    "Bateria": Med
-    "Elev.Sol": Ins
-    "Orient.Sol": Ins
-    "Est.Geo3K": Orl
-
-Tipo_Lectura_Canales_2169: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins, Promedios: Med, Acumulado: Acu, OR Lógica: Orl...
-    "Temp. Ai 2": Med
-    "Hum. Rel": Med
-    "R.Directa2": Med
-    "PIRAN.3": Med
-    "PIRAN.4": Med
-    "R.Infr.Inc": Med
-    "VRef Ext.": Med
-    "T.Carcasa": Med
-    "Auxil.01": Med
-    "V.Vien.2": Med
-    "D.Vien.2": Med
-    "Lluvia": Acu
-    "Estado": Orl
-    "Elev.Sol": Ins
-    "Orient.Sol": Ins
-    "Est.Geo3K": Orl
-
+Tipo_Lectura_Canales: # Previamente deben de existir en la BBDD (por lo que deben de estar configuradas en Teletrans) - Medidas Instantáneas: Ins., Promedios: Med, Acumulado: Acu, OR Lógica...
+    316:
+        "Temp. Ai 1": Med
+        "R.Directa1": Med
+        "PIRAN.1": Med
+        "PIRAN.2": Med
+        "Celula Top": Med
+        "Celula Mid": Med
+        "Celula Bot": Med
+        "Top - Cal ": Med
+        "Mid - Cal ": Med
+        "Bot - Cal ": Med
+        "Presion": Med
+        "V.Vien.1": Med
+        "D.Vien.1": Med
+        "Bateria": Med
+        "Elev.Sol": Ins.
+        "Orient.Sol": Ins.
+        "Est.Geo3K": OR Lógica
+        
+    2169:
+        "Temp. Ai 2": Med
+        "Hum. Rel": Med
+        "R.Directa2": Med
+        "PIRAN.3": Med
+        "PIRAN.4": Med
+        "R.Infr.Inc": Med
+        "VRef Ext.": Med
+        "T.Carcasa": Med
+        "Auxil.01": Med
+        "V.Vien.2": Med
+        "D.Vien.2": Med
+        "Lluvia": Acu
+        "Estado": OR Lógica
+        "Elev.Sol": Ins.
+        "Orient.Sol": Ins.
+        "Est.Geo3K": OR Lógica
+        
 Dict_Rename: # Diccionario con los nombres de las variables que se desean modificar. Nombre en la estacion: Nombre que se desea que tenga la variable en el fichero generado
     "Estado" : Limpieza
     "PIRAN.1" : Gh                  # Global Horizontal

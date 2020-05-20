@@ -5,6 +5,7 @@
 """
 import pyodbc
 import pandas as pd
+import numpy as np
 import datetime as dt
 import yaml
 import csv
@@ -46,7 +47,7 @@ def lee_config(dato, path):
     '''
      
     try: 
-        with open(path,'r') as config_file:
+        with open(path,'r', encoding='utf8') as config_file:
             config_yaml = yaml.load(config_file, Loader = yaml.FullLoader) #Se utiliza el FullLoader para evitar un mensaje de advertencia, ver https://msg.pyyaml.org/load para mas información
                                                                     #No se utiliza el BasicLoader debido a que interpreta todo como strings, con FullLoader los valores numéricos los intrepreta como int o float
         return config_yaml[dato]
@@ -223,19 +224,32 @@ def get_channels_config(numero_estacion):
     data_channels_config = (
             pd.read_sql(query_channels_config, pyodbc.connect(request))
      )
-    # Se modifica el NunFuncion de cada medida para obtener los valores promedios cuando proceda
-    medidas_promedio = lee_config('Medidas_Promedio', PATH_CONFIG_PYGEONICA)
+    
+    # Se obtiene la correspondecia Nombre de funcion -> número de función de la base de datos
+    numFunciones = get_functions().reset_index().set_index('Nombre')
+    
+    # Diccionario en el que se indica que tipo de medida se desea alacenar por cada canal
+    tipo_medidas = lee_config('Tipo_Lectura_Canales', PATH_CONFIG_PYGEONICA)[numero_estacion]
+   
     data_channels_config.set_index('Abreviatura', inplace=True)
+
+    # Se modifica el NunFuncion de cada medida para obtener las medidas deseadas por cada canal
     # Se recorre la lista de canales...
     for dato in data_channels_config.index:
-        # Hasta que se encuentre canal que se desee modificar...
-        if dato in medidas_promedio:
-            # Si la medida deseada se ha configurado en la estación,
-            # para que se almacenen valores promedios...
-            if 1 in data_channels_config.loc[dato, 'NumFuncion'].tolist():
-                # Se modifica el dataframe, para que se guarden solo los valores promedios
-                ones = [1] * len(data_channels_config.loc[dato, 'NumFuncion'])
-                data_channels_config.loc[dato, 'NumFuncion'] = ones
+        # Hasta que se encuentre el canal que se desee modificar...
+        if dato in tipo_medidas.keys():
+            # Si la medida deseada se ha configurado en la estación...
+            numFuncion = int(numFunciones.loc[tipo_medidas[dato]])
+            # Si sólo hay una medida configurada...
+            if type(data_channels_config.loc[dato, 'NumFuncion']) == np.int64:
+                if numFuncion == data_channels_config.loc[dato, 'NumFuncion']:
+                    # Se modifica el dataframe, para que se guarden solo los valores deseados
+                    data_channels_config.loc[dato, 'NumFuncion'] = numFuncion
+            else: # En el caso de que se hayan configurado varios tipos de medidas...
+                if numFuncion in data_channels_config.loc[dato, 'NumFuncion'].tolist():
+                    # Se modifica el dataframe, para que se guarden solo los valores deseados
+                    vals = [numFuncion] * len(data_channels_config.loc[dato, 'NumFuncion'])
+                    data_channels_config.loc[dato, 'NumFuncion'] = vals
      
     data_channels_config.reset_index(inplace=True)
             
