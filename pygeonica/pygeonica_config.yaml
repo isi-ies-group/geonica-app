@@ -49,9 +49,9 @@ Tipo_Lectura_Canales: # Previamente deben de existir en la BBDD (por lo que debe
         "Celula Top": Med
         "Celula Mid": Med
         "Celula Bot": Med
-        "Top - Cal ": Med
-        "Mid - Cal ": Med
-        "Bot - Cal ": Med
+        "Top - Cal ": Ins.
+        "Mid - Cal ": Ins.
+        "Bot - Cal ": Ins.
         "Presion": Med
         "V.Vien.1": Med
         "D.Vien.1": Med
