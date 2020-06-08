@@ -182,7 +182,7 @@ Sensores:
         Info:
             Marca: KIPP & ZONEN
             Modelo: CHP1
-            NumSerie:
+            NumSerie: 110753
             Tipo: Pirheliometro
         NumEstacion: 2169
         NumCanal_Logico: 3
