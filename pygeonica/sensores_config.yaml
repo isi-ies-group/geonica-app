@@ -24,6 +24,7 @@ Sensores:
             Constante: 204,498977
             Funcion_Matematica:
         Etiqueta: Pirano
+        Comentarios: No conectado desde 2020-03, antiguo D(0) en Helios. Sustituido por Eppley 18565F3
     -
         Info:
             Marca: YOUNG
@@ -40,6 +41,7 @@ Sensores:
             Constante: 1
             Funcion_Matematica: YSI44031
         Etiqueta: Temp
+        Comentarios:
     -
         Info:
             Marca: EPPLEY
@@ -56,6 +58,7 @@ Sensores:
             Constante: 128.5347
             Funcion_Matematica:
         Etiqueta: Datos Seg
+        Comentarios:
     -
         Info:
             Marca: EPPLEY
@@ -72,6 +75,7 @@ Sensores:
             Constante: 127.3885
             Funcion_Matematica:
         Etiqueta: Pirano 1
+        Comentarios:
     -
         Info:
             Marca: EPPLEY
@@ -88,6 +92,7 @@ Sensores:
             Constante: 112.1076
             Funcion_Matematica:
         Etiqueta: Pirano 2
+        Comentarios: Anteriormente instalado en seguidor módulos para GNI (controlado por Steve)
     -
         Info:
             Marca:
@@ -104,6 +109,7 @@ Sensores:
             Constante: 13.4479, 13.22984, 15.67062
             Funcion_Matematica:
         Etiqueta: TRIT REF
+        Comentarios:
     -
         Info:
             Marca: YOUNG
@@ -120,6 +126,7 @@ Sensores:
             Constante:
             Funcion_Matematica:
         Etiqueta: Pt ATM
+        Comentarios:
     -
         Info:
             Marca: WINDSONIC
@@ -136,6 +143,7 @@ Sensores:
             Constante:
             Funcion_Matematica:
         Etiqueta: Viento VEL_DIR
+        Comentarios:
     -
         Info:
             Marca: GEONICA
@@ -152,22 +160,41 @@ Sensores:
             Constante:
             Funcion_Matematica: YSI44031
         Etiqueta: T.amb + RH
+        Comentarios:
     -
         Info:
             Marca: KIPP & ZONEN
             Modelo: CH1 NIP
             NumSerie: CH11930035
             Tipo: Pirheliometro
-        NumEstacion: 2169
-        NumCanal_Logico: 3
-        NumCanal_Fisico: A03
-        Nombre_Parametro: R.Directa2
+        NumEstacion:
+        NumCanal_Logico:
+        NumCanal_Fisico:
+        Nombre_Parametro:
         Configuracion:
             Sensibilidad: 7.63
             Sensibilidad_unidad: uV(W/m2)
             Constante: 131.0615989
             Funcion_Matematica:
+        Etiqueta:
+        Comentarios: Desconectado en 2020-03. Se cambia por K&Z CHP1
+    -
+        Info:
+            Marca: KIPP & ZONEN
+            Modelo: CHP1
+            NumSerie:
+            Tipo: Pirheliometro
+        NumEstacion: 2169
+        NumCanal_Logico: 3
+        NumCanal_Fisico: A03
+        Nombre_Parametro: R.Directa2
+        Configuracion:
+            Sensibilidad: 7.75
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 129.0323
+            Funcion_Matematica:
         Etiqueta: Pirhelio K&Z
+        Comentarios: Anteriomente usado por III-V.
     -
         Info:
             Marca: EPPLEY
@@ -184,6 +211,7 @@ Sensores:
             Constante: 127.8772378
             Funcion_Matematica:
         Etiqueta: Pirano 3
+        Comentarios:
     -
         Info:
             Marca: LI-COR
@@ -200,6 +228,7 @@ Sensores:
             Constante: 76.45
             Funcion_Matematica:
         Etiqueta: Pirano 4(Corriente)
+        Comentarios:
     -
         Info:
             Marca: KIPP & ZONEN
@@ -216,6 +245,7 @@ Sensores:
             Constante: 75.1879699
             Funcion_Matematica:
         Etiqueta: Pirgeometro
+        Comentarios:
     -
         Info:
             Marca: WINDSONIC
@@ -232,6 +262,7 @@ Sensores:
             Constante:
             Funcion_Matematica:
         Etiqueta: Viento VEL_DIR
+        Comentarios:
     -
         Info:
             Marca: PRONAMIC
@@ -248,3 +279,4 @@ Sensores:
             Constante:
             Funcion_Matematica:
         Etiqueta: Pluviometro
+        Comentarios:
