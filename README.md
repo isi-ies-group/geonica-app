@@ -1,4 +1,4 @@
 # pygeonica
 
 Para instalarlo como paquete:
-`pip install git+https://github.com/isi-ies-group/pygeonica.git`
+`pip install --upgrade git+https://github.com/isi-ies-group/pygeonica.git`
