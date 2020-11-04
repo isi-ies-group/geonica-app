@@ -381,13 +381,13 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
         data_channels = get_parameters().set_index('NumParametro') #Se obtienen los números de los parámetros...
         data.rename(columns = data_channels['Abreviatura'], inplace=True) #... y se sustituye el NumParametro por el Nombre
         
-    # cambia index a hora civil
-    data.index = (data.index.tz_localize(pytz.utc).
-                  tz_convert(pytz.timezone('Europe/Madrid')).
-                  tz_localize(None))
-    
-    # filtra y se queda solo con los minutos del dia en cuestion, una vez ya se han convertido a hora civil
-    data = data[str(dia)]
+        # cambia index a hora civil
+        data.index = (data.index.tz_localize(pytz.utc).
+                      tz_convert(pytz.timezone('Europe/Madrid')).
+                      tz_localize(None))
+        
+        # filtra y se queda solo con los minutos del dia en cuestion, una vez ya se han convertido a hora civil
+        data = data[str(dia)]
     
     # Si data está vacio, se crea con valores NaN
     indice_fecha = pd.Index(pd.date_range(
