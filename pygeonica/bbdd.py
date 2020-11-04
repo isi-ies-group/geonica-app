@@ -385,6 +385,9 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
         data.index = (data.index.tz_localize(pytz.utc).
                       tz_convert(pytz.timezone('Europe/Madrid')).
                       tz_localize(None))
+                
+        # quita los índices duplicados que se dan en el cambio de hora de otoño (se añade 1h)
+        data = data[~data.index.duplicated()]
         
         # filtra y se queda solo con los minutos del dia en cuestion, una vez ya se han convertido a hora civil
         data = data[str(dia)]
