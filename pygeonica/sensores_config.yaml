@@ -21,7 +21,7 @@ Sensores:
         Configuracion:
             Sensibilidad: 4.89
             Sensibilidad_unidad:  uV(W/m2)
-            Constante: 204,498977
+            Constante: 204.498977
             Funcion_Matematica:
         Etiqueta: Pirano
         Comentarios: No conectado desde 2020-03, antiguo D(0) en Helios. Sustituido por Eppley 18565F3
