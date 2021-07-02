@@ -24,7 +24,7 @@ Sensores:
             Constante: 204.498977
             Funcion_Matematica:
         Etiqueta: Pirano
-        Comentarios: No conectado desde 2020-03, antiguo D(0) en Helios. Sustituido por Eppley 18565F3
+        Comentarios: NO CONECTADO desde 2020-03, antiguo D(0) en Helios. Sustituido por Eppley 18565F3
     -
         Info:
             Marca: YOUNG
@@ -82,18 +82,35 @@ Sensores:
             Modelo: PSP
             NumSerie: 18565F3
             Tipo: Piranometro
-        NumEstacion: 316
-        NumCanal_Logico: 4
-        NumCanal_Fisico: A04
-        Nombre_Parametro: PIRAN.2
+        NumEstacion:
+        NumCanal_Logico:
+        NumCanal_Fisico:
+        Nombre_Parametro:
         Configuracion:
             Sensibilidad: 8.92
             Sensibilidad_unidad: uV(W/m2)
             Constante: 112.1076
             Funcion_Matematica:
-        Etiqueta: Pirano 2
-        Comentarios: Anteriormente instalado en seguidor módulos para GNI (controlado por Steve)
+        Etiqueta: 
+        Comentarios: SUSTITUIDO por Eppley 38949F3. Anteriormente instalado en seguidor módulos para GNI (controlado por Steve)
     -
+        Info:
+            Marca: EPPLEY
+            Modelo: SPP
+            NumSerie: 38949F3
+            Tipo: Piranometro
+        NumEstacion: 316
+        NumCanal_Logico: 4
+        NumCanal_Fisico: A04
+        Nombre_Parametro: PIRAN.2
+        Configuracion:
+            Sensibilidad: 7.99
+            Sensibilidad_unidad: uV(W/m2)
+            Constante: 125.1564
+            Funcion_Matematica:
+        Etiqueta: Pirano 2
+        Comentarios: Comprado nuevo en 2020-09. Reemplaza a Eppley 18565F3 como medida de difusa (PIRAN. 2)
+-
         Info:
             Marca:
             Modelo:
