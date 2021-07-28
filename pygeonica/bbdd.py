@@ -380,24 +380,21 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
         # Cambia codigo NumParametro de BBDD a su nombre de fichero
         data_channels = get_parameters().set_index('NumParametro') #Se obtienen los números de los parámetros...
         data.rename(columns = data_channels['Abreviatura'], inplace=True) #... y se sustituye el NumParametro por el Nombre
-        
-        # cambia index a hora civil
-        data.index = (data.index.tz_localize(pytz.utc).
-                      tz_convert(pytz.timezone('Europe/Madrid')).
-                      tz_localize(None))
-                
-        # quita los índices duplicados que se dan en el cambio de hora de otoño (se añade 1h)
-        data = data[~data.index.duplicated()]
-        
-        # filtra y se queda solo con los minutos del dia en cuestion, una vez ya se han convertido a hora civil
-        data = data[str(dia)]
     
     # Si data está vacio, se crea con valores NaN
     indice_fecha = pd.Index(pd.date_range(
         start=dia, end=dt.datetime.combine(dia, dt.time(23, 59)), freq='1T'))
     if len(data) == 0:
         data = pd.DataFrame(index=indice_fecha, columns=lista_campos)
-
+    
+    # cambia index a hora civil
+    data.index = (data.index.tz_localize(pytz.utc).
+                  tz_convert(pytz.timezone('Europe/Madrid')).
+                  tz_localize(None))
+    
+    # filtra y se queda solo con los minutos del dia en cuestion, una vez ya se han convertido a hora civil
+    data = data[str(dia)]
+    
     # En caso de que el indice esté incompleto, se reindexa para que añada nuevos con valores NaN
     if len(data) != len(indice_fecha):
         data = data.reindex(index=indice_fecha)
