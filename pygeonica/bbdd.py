@@ -395,6 +395,9 @@ def lee_dia_geonica_ddbb(dia, numero_estacion, lista_campos=None):
     # filtra y se queda solo con los minutos del dia en cuestion, una vez ya se han convertido a hora civil
     data = data[str(dia)]
     
+    # en caso de día cambio de hora en otoño, hay 25h. Se quitan duplicados
+    data = data[~data.index.duplicated()]
+    
     # En caso de que el indice esté incompleto, se reindexa para que añada nuevos con valores NaN
     if len(data) != len(indice_fecha):
         data = data.reindex(index=indice_fecha)
