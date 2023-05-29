@@ -5,17 +5,17 @@ Created on Mon Mar 16 09:12:36 2020
 @author: Martin
 """
 
-import serial
-import socket
-import time
-import os
 import datetime as dt
+import os
+import socket
 import struct
+import time
 from pathlib import Path
+
+import serial
 
 from . import bbdd
 from .bbdd import lee_config
-
 
 # %%
 ###########################################################################################################
@@ -32,7 +32,7 @@ try:
 
 except yaml.YAMLError:
     print ("Error in configuration file.\n")
-'''    
+'''
 module_path = os.path.dirname(__file__)
 PATH_CONFIG_PYGEONICA = str(Path(module_path, 'pygeonica_config.yaml'))
 
@@ -41,8 +41,8 @@ config = lee_config('Estacion', PATH_CONFIG_PYGEONICA)
 # Variables globales del módulo
 Estaciones = {}
 for estacion in config['Estaciones']:
-    Estaciones.update({estacion['Num'] : estacion['IP']})
-    
+    Estaciones.update({estacion['Num']: estacion['IP']})
+
 BYTEORDER = config['BYTEORDER']
 PASS = config['PASS']
 NUMERO_USUARIO = config['NUMERO_USUARIO']
@@ -50,7 +50,8 @@ PORT = config['PORT']
 TIEMPO_RTS_ACTIVO = config['TIEMPO_RTS_ACTIVO']
 TIEMPO_ESPERA_DATOS = config['TIEMPO_ESPERA_DATOS']
 
-#%%
+
+# %%
 ###########################################################################################################
 ####
 ####        FUNCIONES INTERNAS DEL PROTOCOLO GEONICA
@@ -58,7 +59,7 @@ TIEMPO_ESPERA_DATOS = config['TIEMPO_ESPERA_DATOS']
 ###########################################################################################################
 
 
-def _cabecera(numero_estacion):  #La cabecera de todos los mensajes recibidos por el sistema de medición
+def _cabecera(numero_estacion):  # La cabecera de todos los mensajes recibidos por el sistema de medición
     """
     Info
     ---------
@@ -75,19 +76,19 @@ def _cabecera(numero_estacion):  #La cabecera de todos los mensajes recibidos po
     CABECERA : bytes
 
     """
-    
-    DLE = bytes(chr(16), encoding='ascii')                  #Data Link Escape
-    SYN = bytes(chr(22), encoding='ascii')                  #Syncronos Idle
-    SOH = bytes(chr(1), encoding='ascii')                   #Start of Heading
-    E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)    #Numero de la estacion de la que se reciben los datos
-    U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)     #Numero del usuario que ha solicitado los datos
-    #C = b'\x00'                                            #Número de comando que se ha solicitado
-    
-    CABECERA = DLE + SYN + DLE + SOH + E + U #+ C
+
+    DLE = bytes(chr(16), encoding='ascii')  # Data Link Escape
+    SYN = bytes(chr(22), encoding='ascii')  # Syncronos Idle
+    SOH = bytes(chr(1), encoding='ascii')  # Start of Heading
+    E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)  # Numero de la estacion de la que se reciben los datos
+    U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)  # Numero del usuario que ha solicitado los datos
+    # C = b'\x00'                                            #Número de comando que se ha solicitado
+
+    CABECERA = DLE + SYN + DLE + SOH + E + U  # + C
     return CABECERA
 
 
-def _comprobar_recepcion(trama_bytes, numero_estacion): 
+def _comprobar_recepcion(trama_bytes, numero_estacion):
     """
     Info
     ----------
@@ -108,23 +109,24 @@ def _comprobar_recepcion(trama_bytes, numero_estacion):
    
 
     """
-    
+
     trama = bytearray(trama_bytes)
     bytes_recibidos = len(trama)
     estado = bool()
-    
-    if bytes_recibidos == 13:                                           #Respuesta indicando sincronizacion completada o error en la comunicación
-        if trama[:8] == _cabecera(numero_estacion):          #Comporbación de que la cabecera recibida es la correcta
-            if (trama[11] == 4):                                                #Bits indicando el fin de la transmisión, sincronización completada
-                estado = True                                                         #Se devuelve un booleano indicando sincronización completada
-            elif (trama[11] == 21):                                             #Error en la sincronización
-                return int.from_bytes(trama[10], byteorder=BYTEORDER)               #Se devuelve el indicador del estado del error            
-    elif bytes_recibidos == 193:            #Respuesta indicando las mediciones pedidas
-        if trama[:8] == _cabecera(numero_estacion):          #Comporbación de que la cabecera recibida es la correcta
-                estado = True
+
+    if bytes_recibidos == 13:  # Respuesta indicando sincronizacion completada o error en la comunicación
+        if trama[:8] == _cabecera(numero_estacion):  # Comporbación de que la cabecera recibida es la correcta
+            if (trama[11] == 4):  # Bits indicando el fin de la transmisión, sincronización completada
+                estado = True  # Se devuelve un booleano indicando sincronización completada
+            elif (trama[11] == 21):  # Error en la sincronización
+                return int.from_bytes(trama[10],
+                                      byteorder=BYTEORDER)  # Se devuelve el indicador del estado del error
+    elif bytes_recibidos == 193:  # Respuesta indicando las mediciones pedidas
+        if trama[:8] == _cabecera(numero_estacion):  # Comporbación de que la cabecera recibida es la correcta
+            estado = True
     else:
-        estado = False                                                    #Estado de error
-        
+        estado = False  # Estado de error
+
     return estado
 
 
@@ -151,44 +153,46 @@ def _visulizar_trama(trama_bytes):
         Lista de números con los bytes recibidos por la estación.
 
     """
-    
+
     trama = []
-    #CABECERA
-    trama.append(trama_bytes[0])                                                        #Data Link Escape
-    trama.append(trama_bytes[1])                                                        #Syncronos Idle
-    trama.append(trama_bytes[2])                                                        #Data Link Escape
-    trama.append(trama_bytes[3])                                                        #Start of Heading
-    trama.append(int.from_bytes(trama_bytes[4:6], byteorder = BYTEORDER))               #Número de
-    trama.append(int.from_bytes(trama_bytes[6:8], byteorder = BYTEORDER))               #   estación
-    trama.append(trama_bytes[8])                                                        #Comando solicitado
-    trama.append(int.from_bytes(trama_bytes[9:11], byteorder = BYTEORDER))              #Longitud de bytes de datos a entregar
-    trama.append(trama_bytes[11])                                                       #Número de canales configurados
-    trama.append(trama_bytes[12])                                                       #Año...
-    trama.append(trama_bytes[13])                                                       #Mes...
-    trama.append(trama_bytes[14])                                                       #Día...
-    trama.append(trama_bytes[15])                                                       #Hora...
-    trama.append(trama_bytes[16])                                                       #Minuto...
-    trama.append(trama_bytes[17])                                                       #Segundo de la estación
-    trama.append(trama_bytes[18])                                                       #Data Link Escape
-    trama.append(trama_bytes[19])                                                       #Start of Text
-    trama = trama + _decodificar_medidas(trama_bytes)                                  #Datos recibidos de los canales, y codificados en formato flotante IEEE 754 32bit(4 bytes por dato)
-    
-    lista1 = []                                                                         
-    for i in range(48 - 1):                                                             #Número de muestra correspondiente desde el incio del perido
-        inicio = 116 + i                                                                #de cálculo
-        lista1.append(int.from_bytes(trama_bytes[inicio:(inicio + 2)], byteorder = BYTEORDER))
+    # CABECERA
+    trama.append(trama_bytes[0])  # Data Link Escape
+    trama.append(trama_bytes[1])  # Syncronos Idle
+    trama.append(trama_bytes[2])  # Data Link Escape
+    trama.append(trama_bytes[3])  # Start of Heading
+    trama.append(int.from_bytes(trama_bytes[4:6], byteorder=BYTEORDER))  # Número de
+    trama.append(int.from_bytes(trama_bytes[6:8], byteorder=BYTEORDER))  # estación
+    trama.append(trama_bytes[8])  # Comando solicitado
+    trama.append(int.from_bytes(trama_bytes[9:11], byteorder=BYTEORDER))  # Longitud de bytes de datos a entregar
+    trama.append(trama_bytes[11])  # Número de canales configurados
+    trama.append(trama_bytes[12])  # Año...
+    trama.append(trama_bytes[13])  # Mes...
+    trama.append(trama_bytes[14])  # Día...
+    trama.append(trama_bytes[15])  # Hora...
+    trama.append(trama_bytes[16])  # Minuto...
+    trama.append(trama_bytes[17])  # Segundo de la estación
+    trama.append(trama_bytes[18])  # Data Link Escape
+    trama.append(trama_bytes[19])  # Start of Text
+    trama = trama + _decodificar_medidas(
+        trama_bytes)  # Datos recibidos de los canales, y codificados en formato flotante IEEE 754 32bit(4 bytes por dato)
+
+    lista1 = []
+    for i in range(48 - 1):  # Número de muestra correspondiente desde el incio del perido
+        inicio = 116 + i  # de cálculo
+        lista1.append(int.from_bytes(trama_bytes[inicio:(inicio + 2)], byteorder=BYTEORDER))
     trama.append(lista1)
-    
+
     lista2 = []
-    for i in range(24 - 1):                                                             #Indicador del estado del canal:
-        lista2.append(trama_bytes[164 + i])                                             # 0:Normal 1:Alarma por umbral superior 2:Alarma por umbral inferior
+    for i in range(24 - 1):  # Indicador del estado del canal:
+        lista2.append(trama_bytes[164 + i])  # 0:Normal 1:Alarma por umbral superior 2:Alarma por umbral inferior
     trama.append(lista2)
-        
-    trama.append(trama_bytes[188])                                                      #Data Link Escape
-    trama.append(trama_bytes[189])                                                      #Enf of Text
-    trama.append(bytearray(trama_bytes[190:192]))                                       #Checksum, equivale al XOR de los bytes pares e impares de datos, por separado; para más info ver página 11 protocolo de comunicaciones geonica
-    trama.append(trama_bytes[192])                                                      #Enquiring
-    
+
+    trama.append(trama_bytes[188])  # Data Link Escape
+    trama.append(trama_bytes[189])  # Enf of Text
+    trama.append(bytearray(trama_bytes[
+                           190:192]))  # Checksum, equivale al XOR de los bytes pares e impares de datos, por separado; para más info ver página 11 protocolo de comunicaciones geonica
+    trama.append(trama_bytes[192])  # Enquiring
+
     return trama
 
 
@@ -222,22 +226,22 @@ def _genera_trama(numero_estacion, comando):
     trama : bytes
         Trama a enviar.
     """
-    
+
     DLE = bytes(chr(16), encoding='ascii')
     SYN = bytes(chr(22), encoding='ascii')
     E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
     comando_comm = bytes(chr(comando), encoding='ascii')
     U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)
     X = 14 * b'\x00'
-    ctrl = b'\xFF' +  b'\xFF'# Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
+    ctrl = b'\xFF' + b'\xFF'  # Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
     pasw = bytes(PASS, encoding='ascii')
     ENQ = bytes(chr(5), encoding='ascii')
-    
+
     trama = DLE + SYN + E + comando_comm + U + X + ctrl + pasw + ENQ
 
     return trama
-    
-    
+
+
 def _genera_trama_sincronizar(numero_estacion, hora):
     """
     Info
@@ -256,13 +260,13 @@ def _genera_trama_sincronizar(numero_estacion, hora):
     trama : bytes
         Trama a enviar.
     """
-    
+
     DLE = bytes(chr(16), encoding='ascii')
     SYN = bytes(chr(22), encoding='ascii')
     E = numero_estacion.to_bytes(2, byteorder=BYTEORDER)
-    comando_sinc = bytes(chr(0), encoding='ascii') # 0: codigo sync hora
+    comando_sinc = bytes(chr(0), encoding='ascii')  # 0: codigo sync hora
     U = NUMERO_USUARIO.to_bytes(2, byteorder=BYTEORDER)
-    A = (hora.year - 2000).to_bytes(1, byteorder=BYTEORDER)        
+    A = (hora.year - 2000).to_bytes(1, byteorder=BYTEORDER)
     M = hora.month.to_bytes(1, byteorder=BYTEORDER)
     D = hora.day.to_bytes(1, byteorder=BYTEORDER)
     d = hora.isoweekday().to_bytes(1, byteorder=BYTEORDER)
@@ -270,12 +274,12 @@ def _genera_trama_sincronizar(numero_estacion, hora):
     m = hora.minute.to_bytes(1, byteorder=BYTEORDER)
     s = hora.second.to_bytes(1, byteorder=BYTEORDER)
     X = 7 * b'\x00'
-    ctrl = b'\xFF' +  b'\xFF'# Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
+    ctrl = b'\xFF' + b'\xFF'  # Verificación de la configuración (CRC16, standard ITU-TSS) 0xFFFF evita verificación
     pasw = bytes(PASS, encoding='ascii')
     ENQ = bytes(chr(5), encoding='ascii')
-    
+
     trama = DLE + SYN + E + comando_sinc + U + A + M + D + d + H + m + s + X + ctrl + pasw + ENQ
-        
+
     return trama
 
 
@@ -295,21 +299,23 @@ def _decodificar_medidas(trama_bytes):
     valor : list de floats
         Medidas de los canales.
     """
-    
+
     trama = bytearray(trama_bytes)
     medidas = []
-    canales_configurados = trama_bytes[11]                    #Bytes indicando el numero de canales configurados
-    
-    for i in range(canales_configurados):                          
-        byte_comienzo_muestra = 20 + (4 * i)                                  #Comienzo de los bytes de datos
-        byte_fin_muestra = byte_comienzo_muestra + 4                         #Longitud de cada muestra de 4bytes
-        medidas.append(trama[byte_comienzo_muestra:byte_fin_muestra])   #Se añade a la lista de medidas la medida del siguiente canal   
-    
-    #Se pasa de la codificacion IEEE32bit a float
+    canales_configurados = trama_bytes[11]  # Bytes indicando el numero de canales configurados
+
+    for i in range(canales_configurados):
+        byte_comienzo_muestra = 20 + (4 * i)  # Comienzo de los bytes de datos
+        byte_fin_muestra = byte_comienzo_muestra + 4  # Longitud de cada muestra de 4bytes
+        medidas.append(trama[
+                       byte_comienzo_muestra:byte_fin_muestra])  # Se añade a la lista de medidas la medida del siguiente canal
+
+    # Se pasa de la codificacion IEEE32bit a float
     valor = []
-    for medida in medidas:                                #Se atraviese el array 
-        valor.append(struct.unpack('>f', medida)[0])           #Por cada canal configurado, se transforma a float la medicion, actualmente codificado en IEEE 754 32bit
-    
+    for medida in medidas:  # Se atraviese el array
+        valor.append(struct.unpack('>f', medida)[
+                         0])  # Por cada canal configurado, se transforma a float la medicion, actualmente codificado en IEEE 754 32bit
+
     return valor
 
 
@@ -330,9 +336,10 @@ def _decodificar_FechayHora(trama_bytes):
         Fecha y hora de la estación.
 
     """
-    #class datetime.datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0)  #Constructor de la clase datetime
-    date = dt.datetime(trama_bytes[12] + 2000, trama_bytes[13], trama_bytes[14], trama_bytes[15], trama_bytes[16], trama_bytes[17])
-    
+    # class datetime.datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0)  #Constructor de la clase datetime
+    date = dt.datetime(trama_bytes[12] + 2000, trama_bytes[13], trama_bytes[14], trama_bytes[15], trama_bytes[16],
+                       trama_bytes[17])
+
     '''
     La trama contiene la siguiente información:
     
@@ -344,10 +351,11 @@ def _decodificar_FechayHora(trama_bytes):
     date.minute = trama_bytes[16]
     date.second = trama_bytes[17]
     '''
-    
+
     return date
 
-#%%
+
+# %%
 ###########################################################################################################
 ####
 ####        FUNCIONES INTERNAS DE COMUNICACIÓN
@@ -375,23 +383,23 @@ def _socket(dir_socket, trama, num_bytes):
         La lectura de la estación en bruto
 
     """
-    
-    #Se crear el scoket y se conceta con la estación
+
+    # Se crear el scoket y se conceta con la estación
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.error as err:
-        print('Error en la creación del socket.\n %s' %(err))
+        print('Error en la creación del socket.\n %s' % (err))
         return -1
     try:
         sock.connect(dir_socket)
     except socket.error as err:
-        print('Error en la conexión del socket.\n %s' %(err))
+        print('Error en la conexión del socket.\n %s' % (err))
         return -1
-    
-    #Se envía la trama a la estación
+
+    # Se envía la trama a la estación
     sock.sendall(trama)
-    
-    #Se espera hasta que se reciban el numero de bytes deseados
+
+    # Se espera hasta que se reciban el numero de bytes deseados
     try:
         time.sleep(2 * TIEMPO_ESPERA_DATOS)
         sock.settimeout(5 * TIEMPO_ESPERA_DATOS)
@@ -403,8 +411,8 @@ def _socket(dir_socket, trama, num_bytes):
         sock.close()
     except:
         print('Error al cerrar el socket.\n')
-    
-    #Se devuelve la lectura obtenida
+
+    # Se devuelve la lectura obtenida
     return lectura
 
 
@@ -424,38 +432,38 @@ def _serial(dir_serial, trama):
         La lectura de la estación en bruto
 
     """
-    #Se confiura y abre el puerto serie
+    # Se confiura y abre el puerto serie
     try:
         ser = serial.Serial(
-                    port=dir_serial,
-                    baudrate=57600,
-                    parity=serial.PARITY_NONE,
-                    stopbits=serial.STOPBITS_ONE,
-                    bytesize=serial.EIGHTBITS
-                    )
+            port=dir_serial,
+            baudrate=57600,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS
+        )
     except:
         print('Error en la aperura del puerto serie.\n')
         return -1
-    
+
     # Debe activarse la linea RTS 1seg. antes del envio para que el dispositivo se prepare, si esta en modo ahorro,
     ## Mantener nivel alto durante 100ms y descactivar es suficiente  Referencia: Protocolo de comunicaciones Geonica Meteodata 3000 Página 3 Apartado 2.a.ii
     ser.rts = True
     time.sleep(TIEMPO_RTS_ACTIVO)
     ser.rts = False
-    
-    #Se escribe en el buffer de salida la trama deseada y se espera un tiempo para que la estación responda
-    ser.write(trama)      
+
+    # Se escribe en el buffer de salida la trama deseada y se espera un tiempo para que la estación responda
+    ser.write(trama)
     time.sleep(TIEMPO_ESPERA_DATOS)
-    
-    #Se lee el buffer de entrada donde debería estar la informacion recibida
+
+    # Se lee el buffer de entrada donde debería estar la informacion recibida
     lectura = ser.read_all()
     ser.close()
-    
-    #Se devuelve la lectura obtenida
+
+    # Se devuelve la lectura obtenida
     return lectura
 
 
-#%%
+# %%
 ###########################################################################################################
 ####
 ####        INTERFAZ DE USUARIO
@@ -463,7 +471,7 @@ def _serial(dir_serial, trama):
 ###########################################################################################################
 
 
-def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1):
+def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1, canales=None):
     """
     Info
     ----------
@@ -501,36 +509,63 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         que contiene una lista con los valores de las medidas obtenidas, 
         junto con correspondietes unidades.
 
+    >>> import pygeonica as geo
+    >>> lista_canales = ['Temp. Ai 1', 'R.Directa1', 'PIRAN.1', 'PIRAN.2', 'Celula Top', 'Celula Mid', 'Celula Bot', 'Top - Cal ', 'Mid - Cal ', 'Bot - Cal ', 'Presion', 'V.Vien.1', 'D.Vien.1', 'Bateria', 'Elev.Sol', 'Orient.Sol', 'Est.Geo3K']
+    >>> datos_estacion = geo.estacion.lee_canales(num_estacion=316, canales=lista_canales) # 316, 2169
+    (datetime.datetime(2023, 5, 29, 9, 0, 25),
+     {'Temp. Ai 1': [18.47491455078125, '°C'],
+      'R.Directa1': [291.0020751953125, 'W/m2'],
+      'PIRAN.1': [654.1805419921875, 'W/m2'],
+      'PIRAN.2': [440.8472900390625, 'W/m2'],
+      'Celula Top': [278.3514709472656, 'W/m2   '],
+      'Celula Mid': [263.4536437988281, 'W/m2   '],
+      'Celula Bot': [236.49713134765625, 'W/m2   '],
+      'Top - Cal ': [1.0210254192352295, 'W/m2   '],
+      'Mid - Cal ': [0.0806388333439827, 'W/m2   '],
+      'Bot - Cal ': [-0.04586521163582802, 'W/m2   '],
+      'Presion': [935.1735229492188,
+       Abreviatura
+       Presion      mb
+       Presion      mb
+       Presion    dbar
+       Presion      mm
+       Presion     kPa
+       Name: Unidad, dtype: object],
+      'V.Vien.1': [1.690000057220459, 'm/s'],
+      'D.Vien.1': [75.0, '°'],
+      'Bateria': [13.590085983276367, 'V'],
+      'Elev.Sol': [45.46770477294922, '°'],
+      'Orient.Sol': [100.17545318603516, '°'],
+      'Est.Geo3K': [0.0, 'Estado']})
     """
-    
-    #Se define la trama que se va a enviar, en función de la información deseada
+
+    # Se define la trama que se va a enviar, en función de la información deseada
     if (modo == 1) | ((modo >= 12) & (modo <= 22)):
         trama = _genera_trama(num_estacion, modo)
     else:
         print('Error en el modo seleccionado.\n')
         return -1
-    
-    
-    #Se comprueba que la estación pertenece a las estaciones existentes
+
+    # Se comprueba que la estación pertenece a las estaciones existentes
     if not num_estacion in Estaciones:
         print('Error en la selección de la estación, número de estación incorrecto.\n')
         return -1
-    
-    #Se compruba el modo de comunicación
+
+    # Se comprueba el modo de comunicación
     if modo_comm.lower() == 'socket':
         if dir_socket == None:
             dir_socket = Estaciones[num_estacion]
-        #Se comprueba que dir_socket es válido
+        # Se comprueba que dir_socket es válido
         if type(dir_socket) == str:
-            #Se comprueba que la dirrecion tiene un formato adecuado
+            # Se comprueba que la direccion tiene un formato adecuado
             for num in dir_socket.split('.'):
                 if (int(num) < 0) | (int(num) > 255):
-                    print('Error en el formato de la dirrección IP.\n')
+                    print('Error en el formato de la dirección IP.\n')
                     return -1
-            
-            num_bytes = 193 #Según el protocolo de geonica, la trama recibida por la estacion es de 193 bytes (Esto no se cumple si se solicita sincronización de hora)
-            #Una vez hechas las comprbaciones, comienza la comunicación
-            #Se intenta realizar la comunicación hasta un número máximo de intentos(5)
+
+            num_bytes = 193  # Según el protocolo de geonica, la trama recibida por la estacion es de 193 bytes (Esto no se cumple si se solicita sincronización de hora)
+            # Una vez hechas las comprobaciones, comienza la comunicación
+            # Se intenta realizar la comunicación hasta un número máximo de intentos(5)
             lectura = []
             intentos = 0
             while len(lectura) != num_bytes:
@@ -538,83 +573,84 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
                 intentos += 1
                 if (intentos > 5) | (lectura == -1):
                     break
-            
-            #Lectura errónea
+
+            # Lectura errónea
             if lectura == -1:
                 return -1
-            
+
         else:
-            print('Por favor, indique una dirreción IP válida.\n')
+            print('Por favor, indique una dirección IP válida.\n')
             return -1
-        
+
     elif modo_comm.lower() == 'serial':
-        #Se comprueba que dir_serie es válido
-        if not(dir_serie == None) & (type(dir_socket) == str):
-            #Se compruba que la dirrecion tiene un formato adecuado
+        # Se comprueba que dir_serie es válido
+        if not (dir_serie == None) & (type(dir_socket) == str):
+            # Se comprueba que la direccion tiene un formato adecuado
             with str.upper().split('M') as puerto:
-                cond_tipo = (puerto[0].isalpha() & puerto[1].isdigit()) 
+                cond_tipo = (puerto[0].isalpha() & puerto[1].isdigit())
                 cond_formato = len(puerto) == 2
                 if (not cond_tipo) | (not cond_formato):
-                    print('Error en el formato de la dirrección de puerto serie.\n')
+                    print('Error en el formato de la dirección de puerto serie.\n')
                     return -1
-            
-            #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = _serial(dir_serie,trama)
-            
-            #Lectura errónea
+
+            # Una vez hechas las comprbaciones, comienza la comunicación
+            lectura = _serial(dir_serie, trama)
+
+            # Lectura errónea
             if lectura == -1:
                 return -1
-            
+
         else:
             print('Por favor, indique una dirreción de puerto serie.\n')
             return -1
     else:
         print('Error en la selección del modo de comunicación, modo no válido.\n')
         return -1
-    
-    #Tratamiento de la lectura de la estación
-    
-    #Se comprueba si la transmisión ha sido correcta
+
+    # Tratamiento de la lectura de la estación
+
+    # Se comprueba si la transmisión ha sido correcta
     estado_recepcion = _comprobar_recepcion(lectura, num_estacion)
-    
+
     '''
     En caso de que se produzca un error, se devuelve el número del error
     Si el estado de la recepcion es correcto se devuelve un True
     En cualquier otro caso, p.ej. el número de bytes recibidos no es el esperado, el valor devuelto es un False
-    ''' 
+    '''
     if estado_recepcion != True:
         print("Error en la comunicacion con la estación.\n")
         return estado_recepcion
-    
-    #Si hay algo que leer...
+
+    # Si hay algo que leer...
     if lectura:
-        #Obtencion de la fecha de la estación
+        # Obtencion de la fecha de la estación
         fecha = _decodificar_FechayHora(lectura)
         print('La fecha de la estación es: ')
         print(fecha)
-        
-        #Obtencion de las medidas instantáneas
+
+        # Obtencion de las medidas instantáneas
         medidas = _decodificar_medidas(lectura)
         # print('Las medidas obtenidas son:\n')
         # print(medidas)
-        
+
     else:
         print("Error en la recepción.\n")
         return -1
-    
-    canales = bbdd.get_channels_config(num_estacion)['Abreviatura'].tolist()
-    
-    #Se crea un lista con las unidades de las variables
+
+    if canales is None:
+        canales = bbdd.get_channels_config(num_estacion)['Abreviatura'].tolist()
+
+    # Se crea un lista con las unidades de las variables
     unidades = []
     for medida in canales:
         param = bbdd.get_parameters().set_index('Abreviatura')['Unidad']
         unidades.append(param.loc[medida])
-    
-    #Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
-    med =[list(x) for x in zip(medidas,unidades)]
+
+    # Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
+    med = [list(x) for x in zip(medidas, unidades)]
     res = dict(zip(canales, med))
-    
-    #Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas, junto con sus unidades
+
+    # Al finalizar la comunicación, se devuelve la fecha y las medidas obtenidas, junto con sus unidades
     return fecha, res
 
 
@@ -642,30 +678,30 @@ def sincroniza_hora(num_estacion, hora, modo_comm='socket', dir_socket=None, dir
         el número del error recibido.
 
     """
-    
-    #Se define la trama que se va a enviar, en función de la información deseada
+
+    # Se define la trama que se va a enviar, en función de la información deseada
     trama = _genera_trama_sincronizar(num_estacion, hora)
-    
-    #Se comprueba que la estación pertenece a las estaciones existentes
+
+    # Se comprueba que la estación pertenece a las estaciones existentes
     if not num_estacion in Estaciones:
         print('Error en la selección de la estación, número de estación incorrecto.\n')
         return -1
-    
-    #Se compruba el modo de comunicación
+
+    # Se compruba el modo de comunicación
     if modo_comm.lower() == 'socket':
         if dir_socket == None:
             dir_socket = Estaciones[num_estacion]
-        #Se comprueba que dir_socket es válido
+        # Se comprueba que dir_socket es válido
         if type(dir_socket) == str:
-            #Se comprueba que la dirrecion tiene un formato adecuado
+            # Se comprueba que la dirrecion tiene un formato adecuado
             for num in dir_socket.split('.'):
                 if (int(num) < 0) | (int(num) > 255):
                     print('Error en el formato de la dirrección IP.\n')
-                    return -1     
-                
-            num_bytes = 13 #Según el protocolo de geonica, la trama recibida por la estacion es de 13 bytes
-            #Una vez hechas las comprbaciones, comienza la comunicación
-            #Se intenta realizar la comunicación hasta un número máximo de intentos(5)
+                    return -1
+
+            num_bytes = 13  # Según el protocolo de geonica, la trama recibida por la estacion es de 13 bytes
+            # Una vez hechas las comprbaciones, comienza la comunicación
+            # Se intenta realizar la comunicación hasta un número máximo de intentos(5)
             lectura = []
             intentos = 0
             while len(lectura) != num_bytes:
@@ -673,47 +709,46 @@ def sincroniza_hora(num_estacion, hora, modo_comm='socket', dir_socket=None, dir
                 intentos += 1
                 if (intentos > 5) | (lectura == -1):
                     break
-            
-            #Lectura errónea
+
+            # Lectura errónea
             if lectura == -1:
                 return -1
-            
+
         else:
             print('Por favor, indique una dirreción IP válida.\n')
             return -1
-        
+
     elif modo_comm.lower() == 'serial':
-        #Se comprueba que dir_serie es válido
-        if not(dir_serie == None) & (type(dir_socket) == str):
-            #Se compruba que la dirrecion tiene un formato adecuado
+        # Se comprueba que dir_serie es válido
+        if not (dir_serie == None) & (type(dir_socket) == str):
+            # Se compruba que la dirrecion tiene un formato adecuado
             with str.upper().split('M') as puerto:
-                cond_tipo = (puerto[0].isalpha() & puerto[1].isdigit()) 
+                cond_tipo = (puerto[0].isalpha() & puerto[1].isdigit())
                 cond_formato = len(puerto) == 2
                 if (not cond_tipo) | (not cond_formato):
                     print('Error en el formato de la dirrección de puerto serie.\n')
                     return -1
-            
-            
-            #Una vez hechas las comprbaciones, comienza la comunicación
-            lectura = _serial(dir_serie,trama)
-            
-            #Lectura errónea
+
+            # Una vez hechas las comprbaciones, comienza la comunicación
+            lectura = _serial(dir_serie, trama)
+
+            # Lectura errónea
             if lectura == -1:
                 return -1
-            
+
         else:
             print('Por favor, indique una dirreción de puerto serie.\n')
             return -1
     else:
         print('Error en la selección del modo de comunicación, modo no válido.\n')
         return -1
-    
-    #Se compurba que la sincronización ha sido correcta
+
+    # Se compurba que la sincronización ha sido correcta
     estado_recepcion = _comprobar_recepcion(lectura, num_estacion)
     if estado_recepcion == True:
         print('Fecha sincronizada.\n')
         return True
-    else:   
+    else:
         print("Error en la comunicacion con la estación.\n")
         print(estado_recepcion)
         return False
