@@ -471,7 +471,8 @@ def _serial(dir_serial, trama):
 ###########################################################################################################
 
 
-def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1, canales=None):
+def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=None, modo=1, canales=None,
+                obtiene_unidades=True):
     """
     Info
     ----------
@@ -641,10 +642,13 @@ def lee_canales(num_estacion, modo_comm='socket', dir_socket=None, dir_serie=Non
         canales = bbdd.get_channels_config(num_estacion)['Abreviatura'].tolist()
 
     # Se crea un lista con las unidades de las variables
-    unidades = []
-    for medida in canales:
-        param = bbdd.get_parameters().set_index('Abreviatura')['Unidad']
-        unidades.append(param.loc[medida])
+    if obtiene_unidades:
+        unidades = []
+        for medida in canales:
+            param = bbdd.get_parameters().set_index('Abreviatura')['Unidad']
+            unidades.append(param.loc[medida])
+    else:
+        unidades = len(canales)*['']
 
     # Se crea un diccionario cuya clave es el nombre del canal y contiene la medida correspondiente a dicho canal
     med = [list(x) for x in zip(medidas, unidades)]
